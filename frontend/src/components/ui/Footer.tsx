@@ -87,7 +87,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2.5 pt-2">
                 <MapPin size={16} className="text-white" />
-                <span>Bogotá, Colombia</span>
+                <span>Villa del Rosario, Colombia</span>
               </li>
             </ul>
           </div>

@@ -97,7 +97,7 @@ export default function Navbar() {
                   lineHeight: 1.4,
                 }}
               >
-                DENVER ✦ 1930
+                DENVER ✦ EST. 2019
               </span>
             </div>
           </Link>

@@ -41,12 +41,9 @@ const ScissorsSVG = ({ size = 28, className = '' }: { size?: number; className?:
 // ── SVG CUSTOM: Poste de barbero 1930s con trama ──────────────────────────
 const BarberPoleSVG = () => (
   <svg width="18" height="52" viewBox="0 0 18 52" fill="none" aria-hidden="true">
-    {/* Marco exterior contorno tinta */}
     <rect x="2" y="2" width="14" height="48" rx="7" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    {/* Tapas esféricas superior e inferior */}
     <circle cx="9" cy="6" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
     <circle cx="9" cy="46" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
-    {/* Espirales con trazo de tinta variable */}
     <path d="M2 14 Q9 17 16 14" stroke="currentColor" strokeWidth="2.5" fill="none" />
     <path d="M2 22 Q9 25 16 22" stroke="currentColor" strokeWidth="2.5" fill="none" />
     <path d="M2 30 Q9 33 16 30" stroke="currentColor" strokeWidth="2.5" fill="none" />
@@ -86,8 +83,8 @@ const StarInkSVG = ({ filled = false, size = 16 }: { filled?: boolean; size?: nu
 // MASCOTA "EL MAESTRO SÁNCHEZ" — ESTILO CARTOON RUBBER-HOSE FLEISCHER 1930s
 // Cumple estrictamente las 6 reglas:
 // 1. Hatching / Cross-hatching en negro para volumen y sombras (sin plano gris)
-// 2. Grosor de tinta VARIABLE (silueta externa 5-6px, detalles internos 1.5-2px)
-// 3. Ojos "Pie-Eye" clásicos años 30, cejas expresivas gruesas, boca exagerada sonriente
+// 2. Grosor de tinta VARIABLE (silueta externa 5.5-6px, detalles internos 1.5-2px)
+// 3. Ojos "Pie-Eye" clásicos años 30, cejas gruesas expresivas, boca exagerada sonriente
 // 4. Extremidades Rubber-Hose (tubos flexibles sin codos/rodillas), guante blanco mitón 4-dedos Mickey
 // 5. Textura de grano/tinta y trama analógica integrada sobre la ilustración
 // 6. Pose idéntica con sombrero de copa y tijeras en mano
@@ -331,26 +328,19 @@ const BarberMascotSVG = () => (
       {/* ── BIGOTE VINTAGE CARACTERÍSTICO ── */}
       <path d="M102 154 Q116 146 130 150 Q144 146 158 154 Q166 160 162 165 Q152 162 130 164 Q108 162 98 165 Q94 160 102 154 Z"
         fill="#000000" stroke="#000000" strokeWidth="2" />
-      {/* Rizo de punta izquierda */}
       <path d="M99 164 Q90 166 88 172 Q91 176 96 171 Z" fill="#000000" />
-      {/* Rizo de punta derecha */}
       <path d="M161 164 Q170 166 172 172 Q169 176 164 171 Z" fill="#000000" />
 
 
       {/* ── Rule 3: BOCA EXAGERADA / SONRISA CARTOON ANOS 30 ── */}
-      {/* Boca abierta gigante en D con lengua y dientes */}
       <g transform="translate(130, 168)">
-        {/* Contorno boca */}
         <path d="M-28 0 Q0 30 28 0 Q0 38 -28 0 Z"
           fill="#000000" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
-        {/* Dientes superiores */}
         <path d="M-22 2 Q0 12 22 2 L20 8 Q0 16 -20 8 Z" fill="#ffffff" />
         <line x1="0" y1="4" x2="0" y2="12" stroke="#000000" strokeWidth="1.5" />
         <line x1="-10" y1="3" x2="-9" y2="10" stroke="#000000" strokeWidth="1.5" />
         <line x1="10" y1="3" x2="9" y2="10" stroke="#000000" strokeWidth="1.5" />
-        {/* Lengua roja vintage abajo */}
         <path d="M-14 20 Q0 12 14 20 Q0 34 -14 20 Z" fill="#c1272d" stroke="#000000" strokeWidth="1.5" />
-        {/* Hoyuelos/Pliegues de risa en comisuras */}
         <path d="M-32 -3 Q-28 4 -30 10" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
         <path d="M32 -3 Q28 4 30 10" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
       </g>
@@ -363,7 +353,6 @@ const BarberMascotSVG = () => (
 
       {/* Visera / Ala del sombrero */}
       <ellipse cx="130" cy="94" rx="82" ry="14" fill="#141414" stroke="#000000" strokeWidth="4.5" />
-      {/* Hatching en el ala izquierda */}
       <ellipse cx="130" cy="94" rx="80" ry="12" fill="url(#hatch-dark)" opacity="0.6" />
 
       {/* Copa del sombrero */}
@@ -466,7 +455,7 @@ export default function HomePage() {
 
             {/* ── Texto hero ── */}
             <div>
-              {/* Eyebrow — sello de época */}
+              {/* Eyebrow — sello de época con ubicación y fecha corregidas */}
               <div
                 className="inline-flex items-center gap-2.5 mb-7"
                 style={{
@@ -487,7 +476,7 @@ export default function HomePage() {
                     color: 'var(--gray-300)',
                   }}
                 >
-                  Est. Bogotá, Colombia — Desde 1930
+                  Villa del Rosario, Colombia — Desde 2019
                 </span>
                 <span style={{ color: 'var(--accent-red)' }}>◆</span>
               </div>
@@ -543,7 +532,7 @@ export default function HomePage() {
                 }}
               >
                 Cortes clásicos a navaja, perfilado de barba y toalla caliente —
-                la vieja guardia del oficio, sin concesiones.
+                la vieja guardia del oficio en Villa del Rosario.
               </p>
 
               {/* CTAs */}
