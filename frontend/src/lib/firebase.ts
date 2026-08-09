@@ -5,12 +5,12 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyC04YkDDLw5ahVZLRjnpAMLGltLE7CPa3I',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'barberia-denver.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'barberia-denver',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'barberia-denver.appspot.com',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'barberia-denver.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '77622747470',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:77622747470:web:30363acc8219ca6c27be1f',
 }
 
 const app = initializeApp(firebaseConfig)
