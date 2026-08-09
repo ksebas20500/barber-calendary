@@ -3,105 +3,65 @@ import { useNavigate } from 'react-router-dom'
 import { useReservaStore } from '@/store/reservaStore'
 import { barberosApi } from '@/lib/api'
 
-// Componente de tarjeta de barbero (Referencia: imagen de NUESTROS BARBEROS)
 function BarberoCard({ barbero }: { barbero: any }) {
   const navigate = useNavigate()
   const { setBarbero, setPaso } = useReservaStore()
-  const inicial = barbero.usuario?.nombre?.charAt(0).toUpperCase() || 'B'
-  const nombre = barbero.usuario?.nombre || 'Barbero'
-  const calificacion = barbero.calificacion || 4.9
-  const totalResenas = barbero.totalResenas || 0
+  const nombre = barbero.usuario?.nombre || barbero.nombre || 'Barbero'
+  const inicial = nombre.charAt(0).toUpperCase()
+  const calificacion = barbero.calificacionPromedio || 4.9
 
   const handleReservar = () => {
     setBarbero({
       id: barbero.id,
       nombre,
-      especialidad: barbero.especialidad || 'Barbero Profesional',
+      especialidad: barbero.especialidad || 'BARBERO PROFESIONAL',
       fotoUrl: barbero.fotoUrl || null,
-      calificacionPromedio: barbero.calificacion || 4.9,
+      calificacionPromedio: calificacion,
     })
     setPaso(2)
     navigate('/reservar')
   }
 
-  const nombreCorto = nombre.split(' ').slice(0, 2).join(' ')
+  const nombreCorto = nombre.split(' ')[0].toUpperCase()
 
   return (
-    <div className="border-2 border-white bg-[#141414] shadow-[5px_5px_0_#000] p-6 flex flex-col items-center text-center animate-fadeInUp">
-      {/* Avatar con inicial */}
-      <div
-        className="w-20 h-20 rounded-full border-2 border-white bg-[#f5f5ef] flex items-center justify-center mb-5 shadow-[2px_2px_0_#000]"
-      >
-        {barbero.fotoUrl ? (
-          <img
-            src={barbero.fotoUrl}
-            alt={nombre}
-            className="w-full h-full object-cover rounded-full"
-            style={{ filter: 'grayscale(100%) contrast(1.1)' }}
-          />
-        ) : (
+    <div className="card-barbero-vintage flex flex-col justify-between h-full">
+      <div className="flex flex-col items-center">
+        {/* Círculo Inicial Negro (Estilo Foto 3) */}
+        <div className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center mb-5 border-2 border-black shadow-[2px_2px_0_#000]">
           <span
-            className="text-4xl font-black text-black"
+            className="text-3xl font-bold font-mono"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {inicial}
           </span>
-        )}
-      </div>
+        </div>
 
-      {/* Nombre */}
-      <h3
-        className="text-xl text-white font-black mb-1"
-        style={{ fontFamily: 'var(--font-display)' }}
-      >
-        {nombre}
-      </h3>
-
-      {/* Especialidad */}
-      <p
-        className="text-xs text-[#8c8c87] uppercase tracking-[0.18em] font-mono font-bold mb-4"
-      >
-        {barbero.especialidad || 'Barbero Profesional'}
-      </p>
-
-      {/* Estrellas + Rating */}
-      <div className="flex items-center justify-center gap-1.5 mb-6">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <svg
-            key={i}
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill={i < Math.round(calificacion) ? '#f5f5ef' : 'none'}
-            stroke="#f5f5ef"
-            strokeWidth="2"
-          >
-            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-          </svg>
-        ))}
-        <span
-          className="text-sm text-white font-black ml-1"
+        {/* Nombre */}
+        <h3
+          className="text-2xl font-bold text-black mb-1"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          {calificacion.toFixed(1)}
-        </span>
-        {totalResenas > 0 && (
-          <span className="text-xs text-[#8c8c87] font-mono">({totalResenas})</span>
-        )}
+          {nombre}
+        </h3>
+
+        {/* Especialidad Monospace */}
+        <p className="font-mono text-[0.7rem] font-bold text-black/70 uppercase tracking-[0.18em] mb-3">
+          {barbero.especialidad || 'BARBERO PROFESIONAL'}
+        </p>
+
+        {/* Descripción / Años de oficio */}
+        <p className="font-mono text-xs text-black/80 mb-6">
+          Especialista en corte clásico, barba & afeitado a navaja.
+        </p>
       </div>
 
-      {/* Botón RESERVAR CON ... */}
+      {/* Botón Reservar Con X */}
       <button
         onClick={handleReservar}
-        className="w-full border-2 border-white text-white text-xs font-black uppercase tracking-[0.12em] py-3 shadow-[2px_2px_0_#000] hover:bg-white hover:text-black transition-all cursor-pointer"
-        style={{ fontFamily: 'var(--font-label)' }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget
-          el.classList.add('animate-squash')
-          el.addEventListener('animationend', () => el.classList.remove('animate-squash'), { once: true })
-        }}
+        className="w-full btn-vintage-black py-3 text-xs"
       >
-        RESERVAR CON {nombreCorto.split(' ')[0].toUpperCase()}
+        RESERVAR CON {nombreCorto}
       </button>
     </div>
   )
@@ -115,65 +75,56 @@ export default function BarberosPage() {
   })
 
   return (
-    <div className="py-16" style={{ backgroundColor: 'var(--gray-900)' }}>
-      <div className="page-container">
+    <div className="bg-[#0d0d0d] text-white min-h-screen py-16">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-14">
+          <span className="font-mono text-xs tracking-[0.3em] uppercase text-white/60 block mb-2">
+            LA CUADRILLA
+          </span>
           <h1
-            className="text-5xl md:text-7xl text-white font-black mb-4 text-ink-outline"
-            style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}
+            className="text-4xl md:text-6xl font-bold text-white mb-4"
+            style={{ fontFamily: 'var(--font-display)' }}
           >
-            NUESTROS BARBEROS
+            Nuestros barberos
           </h1>
-          <p
-            className="text-[#8c8c87] max-w-md mx-auto leading-relaxed"
-            style={{ fontFamily: 'var(--font-heading)', fontStyle: 'italic', fontSize: '1rem' }}
-          >
+          <p className="font-mono text-xs text-white/70 max-w-md mx-auto">
             Cada uno con su especialidad y su estilo. Elige con quién quieres sentarte en el sillón.
           </p>
         </div>
 
         {/* Grid de Barberos */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="border-2 border-[#3d3d3d] bg-[#141414] h-80 animate-pulse"
+                className="bg-[#171717] border-2 border-white/20 h-80 animate-pulse"
               />
             ))}
           </div>
         ) : isError ? (
-          <div className="text-center py-16 border-2 border-[var(--color-red)] bg-[#141414] p-8 max-w-lg mx-auto shadow-[4px_4px_0_#000]">
-            <div className="text-4xl mb-3 text-[var(--color-red)] font-black">⚠️ ERROR DE CONEXIÓN</div>
-            <p className="text-white text-sm mb-6 font-mono">
+          <div className="text-center py-16 border-2 border-white bg-[#171717] p-8 max-w-lg mx-auto shadow-[4px_4px_0_#fff]">
+            <div className="text-3xl mb-3 text-white font-bold font-mono">⚠️ ERROR DE CONEXIÓN</div>
+            <p className="text-white/80 text-xs mb-6 font-mono">
               No se pudo obtener la lista de barberos del servidor backend.
             </p>
             <button
               onClick={() => refetch()}
-              className="px-6 py-2.5 bg-white text-black font-bold uppercase text-xs tracking-wider border-2 border-white hover:bg-[var(--color-red)] hover:text-white transition-colors"
+              className="btn-vintage-black bg-white text-black hover:bg-neutral-200"
             >
               Reintentar
             </button>
           </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-20">
-            <div
-              className="text-6xl mb-4 font-black text-white"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              ✂
-            </div>
-            <p className="text-[#8c8c87]" style={{ fontFamily: 'var(--font-body)' }}>
-              No hay barberos registrados aún.
-            </p>
+            <div className="text-6xl mb-4 text-white">✂</div>
+            <p className="font-mono text-sm text-white/60">No hay barberos registrados aún.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {data.map((b: any, i: number) => (
-              <div key={b.id} style={{ animationDelay: `${i * 80}ms` }}>
-                <BarberoCard barbero={b} />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {data.map((b: any) => (
+              <BarberoCard key={b.id} barbero={b} />
             ))}
           </div>
         )}
