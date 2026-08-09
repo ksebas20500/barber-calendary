@@ -4,7 +4,30 @@ import { Pool } from 'pg'
 
 const connectionString = process.env.DATABASE_URL
 
-const pool = new Pool({ connectionString })
+if (!connectionString) {
+  console.error('❌ DATABASE_URL no está definida. El backend no puede conectarse a la base de datos.')
+  process.exit(1)
+}
+
+// Diagnóstico: loggear presencia de la URL (sin exponer credenciales)
+const urlMask = connectionString.replace(/:\/\/([^:@]+):([^@]+)@/, '://***:***@')
+console.log(`[prisma] Conectando a: ${urlMask}`)
+
+// Neon requiere SSL; aseguramos que el pool lo use aunque no esté en la cadena
+const sslRequired =
+  connectionString.includes('neon.tech') ||
+  connectionString.includes('sslmode=require') ||
+  connectionString.includes('sslmode=verify')
+
+const pool = new Pool({
+  connectionString,
+  ssl: sslRequired ? { rejectUnauthorized: false } : undefined,
+})
+
+pool.on('error', (err) => {
+  console.error('[pg pool] Error inesperado:', err.message)
+})
+
 const adapter = new PrismaPg(pool)
 
 const globalForPrisma = globalThis as unknown as {
