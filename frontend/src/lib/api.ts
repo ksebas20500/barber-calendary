@@ -1,7 +1,13 @@
 import axios from 'axios'
 import { auth } from './firebase'
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+// Backend URL en Render (producción) o variable de entorno VITE_API_URL
+const RENDER_BACKEND_URL = 'https://barber-calendary.onrender.com'
+
+const API_BASE =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL !== '/api'
+    ? import.meta.env.VITE_API_URL
+    : RENDER_BACKEND_URL
 
 const api = axios.create({
   baseURL: API_BASE,

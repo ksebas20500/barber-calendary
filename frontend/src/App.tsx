@@ -9,6 +9,7 @@ import HomePage from '@/pages/client/HomePage'
 import ServiciosPage from '@/pages/client/ServiciosPage'
 import ReservaPage from '@/pages/client/ReservaPage'
 import PerfilPage from '@/pages/client/PerfilPage'
+import BarberosPage from '@/pages/client/BarberosPage'
 
 import AdminLayout from '@/components/admin/AdminLayout'
 import AdminDashboardPage from '@/pages/admin/DashboardPage'
@@ -38,6 +39,7 @@ export default function App() {
                 {/* Portal Cliente */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/servicios" element={<ServiciosPage />} />
+                <Route path="/barberos" element={<BarberosPage />} />
                 <Route path="/reservar" element={<ReservaPage />} />
                 <Route path="/perfil" element={<PerfilPage />} />
 

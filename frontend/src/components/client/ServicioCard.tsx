@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Clock } from 'lucide-react'
 import { formatCOP, truncate } from '@/lib/utils'
@@ -16,86 +17,61 @@ interface ServicioCardProps {
   }
 }
 
-// SVG custom de tijeras con trazo de tinta variable (NO Lucide uniforme)
-const ScissorsInkSVG = ({ size = 16 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <path d="M8 5 C9 4.2, 11 4.8, 12 6.5 L18.5 17.5"
-      stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none" />
-    <path d="M24 5 C23 4.2, 21 4.8, 20 6.5 L13.5 17.5"
-      stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none" />
-    <circle cx="16" cy="16.8" r="2.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    <ellipse cx="10" cy="25" rx="4.5" ry="4" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    <ellipse cx="22" cy="25" rx="4.5" ry="4" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    <line x1="12.8" y1="18.8" x2="9.5" y2="21.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    <line x1="19.2" y1="18.8" x2="22.5" y2="21.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-  </svg>
-)
+// Iconos custom dibujados según la imagen de referencia
+const ServiceIconBox = ({ cat, nombre }: { cat: string; nombre: string }) => {
+  const isNavaja = nombre.toLowerCase().includes('navaja') || cat === 'BARBA' && nombre.toLowerCase().includes('afeitado')
+  const isBarba = nombre.toLowerCase().includes('barba') && !isNavaja
+  const isCejas = cat === 'CEJAS' || nombre.toLowerCase().includes('ceja')
 
-const StarInkSVG = ({ size = 11 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-    <polygon
-      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
-      stroke="currentColor" strokeWidth="2" fill="currentColor" strokeLinejoin="round"
-    />
-  </svg>
-)
-
-// Iconos de categoría — dibujados a mano, NO emoji
-const CategoryIconSVG = ({ cat, size = 42 }: { cat: string; size?: number }) => {
-  if (cat === 'CORTE') return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <path d="M12 8 C13 7, 15 7.5, 16 9.5 L27 28"
-        stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" />
-      <path d="M36 8 C35 7, 33 7.5, 32 9.5 L21 28"
-        stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" />
-      <circle cx="24" cy="27" r="3.5" stroke="currentColor" strokeWidth="3.5" fill="none" />
-      <ellipse cx="15" cy="37" rx="6" ry="5" stroke="currentColor" strokeWidth="3.5" fill="none" />
-      <ellipse cx="33" cy="37" rx="6" ry="5" stroke="currentColor" strokeWidth="3.5" fill="none" />
-      <line x1="19" y1="29.5" x2="14" y2="32.5" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="29" y1="29.5" x2="34" y2="32.5" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-    </svg>
-  )
-  if (cat === 'BARBA') return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* Navaja de afeitar estilo 1930s */}
-      <rect x="8" y="10" width="32" height="16" rx="3" stroke="currentColor" strokeWidth="3.5" fill="none" />
-      <line x1="8" y1="18" x2="40" y2="18" stroke="currentColor" strokeWidth="2" />
-      <rect x="16" y="26" width="16" height="6" rx="2" stroke="currentColor" strokeWidth="3" fill="none" />
-      <path d="M16 32 Q24 40 32 32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none" />
-      <circle cx="24" cy="15" r="2.5" stroke="currentColor" strokeWidth="2" fill="none" />
-    </svg>
-  )
-  if (cat === 'PREMIUM') return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* Corona de cartel de circo */}
-      <path d="M8 36 L8 20 L16 28 L24 12 L32 28 L40 20 L40 36Z"
-        stroke="currentColor" strokeWidth="3.5" strokeLinejoin="round" fill="none" />
-      <rect x="6" y="36" width="36" height="6" rx="2" stroke="currentColor" strokeWidth="3" fill="none" />
-    </svg>
-  )
-  if (cat === 'CEJAS') return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      {/* Ojo con ceja exagerada 1930s */}
-      <path d="M10 18 Q24 8 38 18" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" />
-      <ellipse cx="24" cy="26" rx="12" ry="9" stroke="currentColor" strokeWidth="3.5" fill="none" />
-      <circle cx="24" cy="26" r="4.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
-      <circle cx="26" cy="24" r="2" fill="currentColor" />
-    </svg>
-  )
-  // COMBO default
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <polygon
-        points="24,4 29.5,16.5 43,18.5 33,28 35.6,41.5 24,35.5 12.4,41.5 15,28 5,18.5 18.5,16.5"
-        stroke="currentColor" strokeWidth="3.5" strokeLinejoin="round" fill="none"
-      />
-    </svg>
+    <div className="w-14 h-14 border-2 border-white bg-black flex items-center justify-center mb-4 shadow-[2px_2px_0_#000]">
+      {isNavaja ? (
+        /* Navaja recta / Afeitado */
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="8" width="24" height="12" rx="2" stroke="white" strokeWidth="2.5" fill="none" />
+          <line x1="6" y1="14" x2="30" y2="14" stroke="white" strokeWidth="1.5" />
+          <rect x="12" y="20" width="12" height="6" rx="1.5" stroke="white" strokeWidth="2" fill="none" />
+          <path d="M12 26 Q18 32 24 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+        </svg>
+      ) : isBarba ? (
+        /* Silueta de Barba */
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <path
+            d="M8 12 Q18 6 28 12 Q30 20 28 26 Q18 34 8 26 Q6 20 8 12 Z"
+            stroke="white"
+            strokeWidth="2.5"
+            fill="none"
+          />
+          <path d="M12 15 Q18 19 24 15" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+        </svg>
+      ) : isCejas ? (
+        /* Peine / Perfilador de Cejas */
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <rect x="6" y="10" width="24" height="8" rx="1" stroke="white" strokeWidth="2.5" fill="none" />
+          <line x1="9" y1="18" x2="9" y2="24" stroke="white" strokeWidth="2" />
+          <line x1="13" y1="18" x2="13" y2="24" stroke="white" strokeWidth="2" />
+          <line x1="17" y1="18" x2="17" y2="24" stroke="white" strokeWidth="2" />
+          <line x1="21" y1="18" x2="21" y2="24" stroke="white" strokeWidth="2" />
+          <line x1="25" y1="18" x2="25" y2="24" stroke="white" strokeWidth="2" />
+        </svg>
+      ) : (
+        /* Tijeras estilo 1930s por defecto */
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <path d="M9 7 C10 6, 12 7, 13.5 9 L21.5 20" stroke="white" strokeWidth="3" strokeLinecap="round" />
+          <path d="M27 7 C26 6, 24 7, 22.5 9 L14.5 20" stroke="white" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="18" cy="19" r="2.5" stroke="white" strokeWidth="2" fill="none" />
+          <ellipse cx="11.5" cy="28" rx="5" ry="4.5" stroke="white" strokeWidth="2.5" fill="none" />
+          <ellipse cx="24.5" cy="28" rx="5" ry="4.5" stroke="white" strokeWidth="2.5" fill="none" />
+        </svg>
+      )}
+    </div>
   )
 }
 
 export default function ServicioCard({ servicio }: ServicioCardProps) {
   const navigate = useNavigate()
   const { setServicio, setPaso } = useReservaStore()
+  const [expanded, setExpanded] = useState(false)
 
   const handleReservar = () => {
     setServicio({
@@ -109,170 +85,64 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
     navigate('/reservar')
   }
 
-  const SHORT_DESC = 88
+  const SHORT_DESC = 75
 
   return (
-    <div
-      className="card flex flex-col group animate-fadeInUp"
-      style={{ position: 'relative' }}
-    >
-      {/* ── Fotograma de película (imagen o icono) ── */}
-      <div
-        className="film-frame relative mb-4"
-        style={{
-          height: '160px',
-          background: `
-            linear-gradient(160deg,
-              var(--gray-800) 0%,
-              var(--gray-900) 60%,
-              var(--black) 100%
-            )
-          `,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          /* Trama interna tipo hatching */
-          backgroundImage: `
-            linear-gradient(160deg, var(--gray-800) 0%, var(--gray-900) 60%, var(--black) 100%),
-            repeating-linear-gradient(
-              -45deg,
-              rgba(255,255,255,0.015) 0px,
-              rgba(255,255,255,0.015) 1px,
-              transparent 1px,
-              transparent 7px
-            )
-          `,
-          backgroundBlendMode: 'normal, overlay',
-        }}
-      >
-        {servicio.imagenUrl ? (
-          <img
-            src={servicio.imagenUrl}
-            alt={servicio.nombre}
-            className="w-full h-full object-cover"
-            style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.85)' }}
-          />
-        ) : (
-          <div
-            style={{
-              color: 'var(--gray-500)',
-              transition: 'color 0.2s ease, transform 0.2s ease',
-            }}
-            className="group-hover:scale-110"
-          >
-            <CategoryIconSVG cat={servicio.categoria} size={52} />
-          </div>
-        )}
-
-        {/* Badge popular — sello de goma */}
-        {servicio.popular && (
-          <div
-            className="badge badge-popular absolute top-2 right-2"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-          >
-            <StarInkSVG size={10} />
-            POPULAR
-          </div>
-        )}
-
-        {/* Tag de categoría — impreso */}
-        <div
-          className="absolute bottom-2 left-2"
-          style={{
-            background: 'var(--black)',
-            border: '1.5px solid var(--gray-700)',
-            padding: '0.15rem 0.5rem',
-            borderRadius: 'var(--radius-sm)',
-            fontFamily: 'var(--font-label)',
-            fontSize: '0.65rem',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: 'var(--gray-400)',
-          }}
-        >
-          {servicio.categoria}
+    <div className="relative bg-[#141414] border-2.5 border-white shadow-[5px_5px_0_#000] p-6 flex flex-col justify-between animate-fadeInUp">
+      {/* ── Badge POPULAR (Sello rojo superior derecho) ── */}
+      {servicio.popular && (
+        <div className="bg-[#c1272d] text-white border-2 border-white px-3 py-0.5 text-[11px] font-black uppercase tracking-widest shadow-[2px_2px_0_#000] absolute -top-3.5 right-4 z-10">
+          POPULAR
         </div>
-      </div>
+      )}
 
-      {/* ── Contenido de la tarjeta ── */}
-      <div className="flex flex-col flex-1">
+      <div>
+        {/* ── Icono en recuadro blanco de la guía ── */}
+        <ServiceIconBox cat={servicio.categoria} nombre={servicio.nombre} />
+
+        {/* ── Nombre del servicio (Ultra font) ── */}
         <h3
-          style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
-            fontSize: '1.1rem',
-            color: 'var(--white)',
-            marginBottom: '0.5rem',
-            lineHeight: 1.3,
-          }}
+          className="text-2xl text-white font-black mb-2"
+          style={{ fontFamily: 'var(--font-display)' }}
         >
           {servicio.nombre}
         </h3>
 
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.85rem',
-            color: 'var(--gray-400)',
-            lineHeight: 1.6,
-            marginBottom: '1rem',
-            flex: 1,
-          }}
-        >
-          {truncate(servicio.descripcion, SHORT_DESC)}
+        {/* ── Descripción con Ver más ── */}
+        <p className="text-sm text-[#a8a8a0] leading-relaxed mb-1 font-body">
+          {expanded ? servicio.descripcion : truncate(servicio.descripcion, SHORT_DESC)}
         </p>
-
-        {/* Duración */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            fontFamily: 'var(--font-label)',
-            fontSize: '0.75rem',
-            color: 'var(--gray-500)',
-            letterSpacing: '0.05em',
-            marginBottom: '1rem',
-          }}
-        >
-          <Clock size={13} style={{ color: 'var(--gray-600)' }} />
-          <span>A partir de {servicio.duracionMinutos} min</span>
-        </div>
-
-        {/* Precio + CTA */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: '0.75rem',
-            borderTop: '2px solid var(--gray-700)',
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.4rem',
-              color: 'var(--white)',
-              lineHeight: 1,
-            }}
-          >
-            {formatCOP(servicio.precio)}
-          </span>
+        {servicio.descripcion.length > SHORT_DESC && (
           <button
-            onClick={handleReservar}
-            className="btn btn-primary"
-            style={{ padding: '0.45rem 0.9rem', fontSize: '0.78rem' }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget
-              el.classList.add('animate-squash')
-              el.addEventListener('animationend', () => el.classList.remove('animate-squash'), { once: true })
-            }}
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs text-white underline font-bold font-mono inline-block mb-3 cursor-pointer hover:text-[var(--accent-red)]"
           >
-            <ScissorsInkSVG size={14} />
-            Reservar
+            {expanded ? 'Ver menos' : 'Ver más'}
           </button>
+        )}
+
+        {/* ── Duración (A PARTIR DE XX MIN) ── */}
+        <div className="border-t border-[#333] pt-3 mb-5 mt-2 flex items-center gap-1.5 text-xs text-[#8c8c87] font-mono tracking-widest uppercase">
+          <Clock size={14} className="text-[#8c8c87]" />
+          <span>A PARTIR DE {servicio.duracionMinutos} MIN</span>
         </div>
+      </div>
+
+      {/* ── Fila inferior: Precio y Botón RESERVAR ── */}
+      <div className="flex items-center justify-between pt-2">
+        <span
+          className="text-2xl md:text-3xl text-white font-black"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {formatCOP(servicio.precio)}
+        </span>
+
+        <button
+          onClick={handleReservar}
+          className="bg-[#c1272d] text-white border-2 border-white font-black text-xs uppercase px-5 py-2.5 shadow-[3px_3px_0_#000] hover:bg-[#9a1f24] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-pointer"
+        >
+          RESERVAR
+        </button>
       </div>
     </div>
   )

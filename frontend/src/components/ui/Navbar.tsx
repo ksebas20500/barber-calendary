@@ -105,6 +105,7 @@ export default function Navbar() {
           {/* Desktop Nav — Special Elite font, trazo fino */}
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/servicios" className={navLinkClass} style={navLinkStyle}>Servicios</NavLink>
+            <NavLink to="/barberos" className={navLinkClass} style={navLinkStyle}>Barberos</NavLink>
             <NavLink to="/reservar" className={navLinkClass} style={navLinkStyle}>Reservar</NavLink>
             {isBarbero && (
               <NavLink to="/admin" className={navLinkClass} style={navLinkStyle}>Admin</NavLink>
@@ -173,6 +174,7 @@ export default function Navbar() {
         {menuOpen && (
           <div className="md:hidden border-t-2 border-[#262626] py-5 flex flex-col gap-4 animate-fadeIn">
             <NavLink to="/servicios" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Servicios</NavLink>
+            <NavLink to="/barberos" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Barberos</NavLink>
             <NavLink to="/reservar" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Reservar</NavLink>
             {isBarbero && (
               <NavLink to="/admin" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Admin</NavLink>
