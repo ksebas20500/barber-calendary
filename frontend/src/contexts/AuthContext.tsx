@@ -57,15 +57,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const loginWithGoogle = async () => {
-    const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
-    if (!apiKey || apiKey === 'your_api_key') {
-      const msg =
-        '⚠️ No se ha configurado VITE_FIREBASE_API_KEY en el archivo frontend/.env.\n\nPor favor obtén tu Web API Key desde Firebase Console:\nProject Settings -> General -> Web Apps -> apiKey y colócala en frontend/.env'
-      console.error(msg)
-      alert(msg)
-      return
-    }
-
     try {
       await signInWithPopup(auth, googleProvider)
     } catch (error: any) {

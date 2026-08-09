@@ -4,8 +4,16 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 
+const getValidApiKey = () => {
+  const key = import.meta.env.VITE_FIREBASE_API_KEY
+  if (key && key !== 'your_api_key' && key.startsWith('AIza')) {
+    return key
+  }
+  return 'AIzaSyC04YkDDLw5ahVZLRjnpAMLGltLE7CPa3I'
+}
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyC04YkDDLw5ahVZLRjnpAMLGltLE7CPa3I',
+  apiKey: getValidApiKey(),
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'barberia-denver.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'barberia-denver',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'barberia-denver.firebasestorage.app',
