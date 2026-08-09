@@ -1,302 +1,845 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { serviciosApi, barberosApi } from '@/lib/api'
+import { ChevronRight, Award, Users } from 'lucide-react'
+import { serviciosApi } from '@/lib/api'
+import ServicioCard from '@/components/client/ServicioCard'
+import { useAuth } from '@/contexts/AuthContext'
+
+// ── SVG CUSTOM: Tijeras de tinta analógica 1930s (trazo variable + hatching) ──
+const ScissorsSVG = ({ size = 28, className = '' }: { size?: number; className?: string }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 36 36"
+    fill="none"
+    className={className}
+    aria-hidden="true"
+  >
+    <path
+      d="M9 7 C10 6, 12 7, 13.5 9 L21.5 20"
+      stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+    />
+    <path
+      d="M27 7 C26 6, 24 7, 22.5 9 L14.5 20"
+      stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+    />
+    <path d="M11 9.5 L19.5 19" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.6" />
+    <path d="M25 9.5 L16.5 19" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.6" />
+    <circle cx="18" cy="19" r="2.8" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <circle cx="18" cy="19" r="1" fill="currentColor" />
+    <ellipse cx="11.5" cy="28" rx="5" ry="4.5" stroke="currentColor" strokeWidth="3" fill="none" />
+    <ellipse cx="24.5" cy="28" rx="5" ry="4.5" stroke="currentColor" strokeWidth="3" fill="none" />
+    <line x1="14" y1="21" x2="10.5" y2="24.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    <line x1="22" y1="21" x2="25.5" y2="24.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+  </svg>
+)
+
+// ── SVG CUSTOM: Poste de barbero 1930s con trama ──────────────────────────
+const BarberPoleSVG = () => (
+  <svg width="18" height="52" viewBox="0 0 18 52" fill="none" aria-hidden="true">
+    <rect x="2" y="2" width="14" height="48" rx="7" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <circle cx="9" cy="6" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
+    <circle cx="9" cy="46" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
+    <path d="M2 14 Q9 17 16 14" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 22 Q9 25 16 22" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 30 Q9 33 16 30" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 38 Q9 41 16 38" stroke="currentColor" strokeWidth="2.5" fill="none" />
+  </svg>
+)
+
+// ── SVG CUSTOM: Calendario de cita ─────────────────────────────────────────
+const CalendarInkSVG = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="2" y="4" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="2.8" fill="none" />
+    <line x1="2" y1="9.5" x2="22" y2="9.5" stroke="currentColor" strokeWidth="2" />
+    <line x1="7.5" y1="2" x2="7.5" y2="6" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+    <line x1="16.5" y1="2" x2="16.5" y2="6" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+    <circle cx="7.5" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="12" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="16.5" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="7.5" cy="18" r="1.3" fill="currentColor" />
+    <circle cx="12" cy="18" r="1.3" fill="currentColor" />
+  </svg>
+)
+
+// ── SVG CUSTOM: Estrella de tinta ──────────────────────────────────────────
+const StarInkSVG = ({ filled = false, size = 16 }: { filled?: boolean; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+    <polygon
+      points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+      stroke="currentColor"
+      strokeWidth={filled ? '0' : '2.2'}
+      fill={filled ? 'currentColor' : 'none'}
+      strokeLinejoin="round"
+    />
+  </svg>
+)
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MASCOTA "EL MAESTRO SÁNCHEZ" — ESTILO TINTA AÑOS 30S (REFERENCIA FOTO 1)
-// Trazos limpios de tinta negra sobre pergamino, delantal a rayas, moño negro,
-// sosteniendo navaja de afeitar en una mano y peine en la otra.
+// MASCOTA "EL MAESTRO SÁNCHEZ" — ANIMACIÓN RUBBER-HOSE FLEISCHER 1930s (CON BOUNCE)
+// Cumple las 6 reglas:
+// 1. Hatching / Cross-hatching analógico en negro para volumen y sombras
+// 2. Grosor de tinta VARIABLE (silueta externa 6px, detalles internos 1.5 - 2.5px)
+// 3. Ojos "Pie-Eye" clásicos con recorte de pastel + cejas gruesas + boca exagerada
+// 4. Extremidades Rubber-Hose (tubos flexibles sin articulaciones) + guante blanco mitón 4-dedos Mickey
+// 5. Textura de grano y trama analógica integrada sin filtros que rompan renderizado
+// 6. Pose con sombrero y tijeras + ANIMACIÓN RUBBER HOSE IDLE BOUNCE (120 bpm)
 // ═══════════════════════════════════════════════════════════════════════════
 const BarberMascotSVG = () => (
   <svg
-    viewBox="0 0 280 340"
+    viewBox="0 0 260 420"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    aria-label="El Maestro Sánchez — Caricatura 1930s"
-    className="w-full h-auto max-h-[360px] mx-auto"
+    aria-label="El Maestro Sánchez — Caricatura Rubber-Hose 1930s"
+    className="w-full h-full animate-rubber-bounce"
   >
     <defs>
-      {/* Tramas de rayado analógico para sombras */}
-      <pattern id="hatch-dark" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <line x1="0" y1="0" x2="0" y2="6" stroke="#000000" strokeWidth="1.5" />
+      {/* Patrones de Hatching (Rayado analógico) */}
+      <pattern id="hatch-light" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="5" stroke="#000000" strokeWidth="1.2" />
+      </pattern>
+
+      <pattern id="hatch-dark" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="3.5" stroke="#000000" strokeWidth="1.5" />
+      </pattern>
+
+      <pattern id="cross-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="4" stroke="#000000" strokeWidth="1.3" />
+        <line x1="0" y1="0" x2="4" y2="0" stroke="#000000" strokeWidth="1.3" />
       </pattern>
     </defs>
 
-    {/* SOMBRA EN EL SUELO */}
-    <ellipse cx="140" cy="325" rx="75" ry="10" fill="#000000" fillOpacity="0.15" />
+    <g>
+      {/* Sombra proyectada en suelo */}
+      <ellipse cx="130" cy="404" rx="72" ry="10" fill="url(#cross-hatch)" stroke="#000000" strokeWidth="2.5" />
 
-    {/* PIERNAS & ZAPATOS */}
-    <path d="M110 240 Q105 275 100 295" stroke="#000000" strokeWidth="10" strokeLinecap="round" />
-    <path d="M100 295 C85 295 70 300 70 310 C70 318 85 320 105 320 C115 320 115 305 105 295 Z" fill="#000000" />
-    <path d="M170 240 Q175 275 180 295" stroke="#000000" strokeWidth="10" strokeLinecap="round" />
-    <path d="M180 295 C170 305 170 320 180 320 C200 320 215 318 215 310 C215 300 200 295 185 295 Z" fill="#000000" />
+      {/* PIERNAS RUBBER-HOSE (Tubos flexibles) */}
+      {/* Pierna Izquierda */}
+      <path d="M102 315 Q88 355 78 392"
+        stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+      <path d="M102 315 Q88 355 78 392"
+        stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path d="M96 325 Q84 358 75 390 L81 392 Q92 358 102 325 Z"
+        fill="url(#hatch-dark)" opacity="0.9" />
 
-    {/* CUERPO & CAMISA */}
-    <path d="M100 120 L180 120 L195 240 L85 240 Z" fill="#ffffff" stroke="#000000" strokeWidth="3.5" />
+      {/* Pierna Derecha */}
+      <path d="M158 315 Q172 355 182 392"
+        stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+      <path d="M158 315 Q172 355 182 392"
+        stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path d="M164 325 Q176 358 185 390 L179 392 Q168 358 158 325 Z"
+        fill="url(#hatch-dark)" opacity="0.9" />
 
-    {/* DELANTAL A RAYAS (Estilo Foto 1) */}
-    <path d="M108 135 L172 135 L185 240 L95 240 Z" fill="#ffffff" stroke="#000000" strokeWidth="3.5" />
-    <g stroke="#000000" strokeWidth="3.5">
-      <line x1="120" y1="135" x2="112" y2="240" />
-      <line x1="133" y1="135" x2="128" y2="240" />
-      <line x1="147" y1="135" x2="147" y2="240" />
-      <line x1="160" y1="135" x2="165" y2="240" />
+      {/* Zapatos inflados tipo bola Fleischer */}
+      <path d="M52 395 C45 385 70 380 92 388 C98 395 95 404 82 405 C65 406 55 403 52 395 Z"
+        fill="#0d0d0d" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M60 388 C68 384 82 386 86 392" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+      <path d="M208 395 C215 385 190 380 168 388 C162 395 165 404 178 405 C195 406 205 403 208 395 Z"
+        fill="#0d0d0d" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M200 388 C192 384 178 386 174 392" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+
+
+      {/* CUERPO PRINCIPAL (Tronco Rubber-Hose) */}
+      <ellipse cx="130" cy="265" rx="68" ry="66" fill="#000000" />
+      <ellipse cx="130" cy="263" rx="61" ry="59" fill="#f5f5ef" stroke="#000000" strokeWidth="4.5" />
+
+      {/* Sombra lateral con hatching */}
+      <path d="M70 263 C70 298 94 322 130 323 C98 322 76 298 76 263 Z"
+        fill="url(#hatch-dark)" />
+      <path d="M190 263 C190 298 166 322 130 323 C162 322 184 298 184 263 Z"
+        fill="url(#hatch-dark)" />
+
+      {/* Chaleco de barbero 1930s */}
+      <path d="M88 215 Q94 288 98 321 Q130 332 162 321 Q166 288 172 215 Q150 198 130 196 Q110 198 88 215 Z"
+        fill="#141414" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+
+      <path d="M90 217 Q95 288 99 319 L161 319 Q165 288 170 217 Z"
+        fill="url(#cross-hatch)" opacity="0.95" />
+
+      {/* Solapas de la camisa */}
+      <path d="M106 198 L130 234 L154 198 L142 194 L130 206 L118 194 Z"
+        fill="#f5f5ef" stroke="#000000" strokeWidth="3.5" />
+
+      {/* Corbatín de moño rojo vintage */}
+      <path d="M118 226 L108 218 L118 214 L130 220 L142 214 L152 218 L142 226 L130 232 Z"
+        fill="#c1272d" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+
+      {/* Botones de tinta */}
+      <circle cx="130" cy="246" r="4" fill="#000000" stroke="#ffffff" strokeWidth="1.2" />
+      <circle cx="130" cy="267" r="4" fill="#000000" stroke="#ffffff" strokeWidth="1.2" />
+      <circle cx="130" cy="288" r="4" fill="#000000" stroke="#ffffff" strokeWidth="1.2" />
+
+
+      {/* BRAZO IZQUIERDO RUBBER-HOSE (Con tijeras chasqueando) */}
+      <g>
+        <path d="M90 230 Q45 245 32 275 Q26 288 38 294 Q50 300 58 286 Q72 262 96 250"
+          stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+        <path d="M90 230 Q45 245 32 275 Q26 288 38 294 Q50 300 58 286 Q72 262 96 250"
+          stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+        <path d="M45 245 Q32 275 26 288 L34 292 Q42 275 52 250 Z"
+          fill="url(#hatch-dark)" />
+
+        {/* Guante Blanco Cartoon Mitón (Mickey/Cuphead style) */}
+        <g transform="translate(10, 270)">
+          <ellipse cx="32" cy="18" rx="12" ry="6" fill="#f5f5ef" stroke="#000000" strokeWidth="3.8" />
+          <path d="M20 18 C10 12 8 30 22 36 C34 40 42 28 32 18 Z"
+            fill="#f5f5ef" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+
+          <path d="M15 15 C8 10 5 20 14 22 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M16 28 C8 32 10 42 20 38 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M23 35 C18 44 26 48 30 40 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M30 36 C30 44 38 42 34 34 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+
+          {/* 3 Costuras negras de guante */}
+          <path d="M24 22 L22 29" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M28 22 L27 30" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M32 23 L32 29" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+
+        {/* Tijeras animadas chasqueando */}
+        <g className="animate-scissors" transform="translate(0, 260)">
+          <path d="M10 6 L24 28" stroke="#000000" strokeWidth="5.5" strokeLinecap="round" />
+          <path d="M10 6 L24 28" stroke="#f5f5ef" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M28 6 L14 28" stroke="#000000" strokeWidth="5.5" strokeLinecap="round" />
+          <path d="M28 6 L14 28" stroke="#f5f5ef" strokeWidth="2.5" strokeLinecap="round" />
+          <circle cx="19" cy="25" r="4.5" stroke="#000000" strokeWidth="3.5" fill="#f5f5ef" />
+          <circle cx="19" cy="25" r="1.8" fill="#000000" />
+          <ellipse cx="12" cy="33" rx="5.5" ry="4.5" stroke="#000000" strokeWidth="3.5" fill="none" />
+          <ellipse cx="26" cy="33" rx="5.5" ry="4.5" stroke="#000000" strokeWidth="3.5" fill="none" />
+        </g>
+      </g>
+
+
+      {/* BRAZO DERECHO RUBBER-HOSE (Animación saludando) */}
+      <g className="animate-rubber-arm">
+        <path d="M170 230 Q210 235 228 210 Q240 195 230 184 Q218 175 208 190 Q192 210 164 220"
+          stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+        <path d="M170 230 Q210 235 228 210 Q240 195 230 184 Q218 175 208 190 Q192 210 164 220"
+          stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+        <path d="M210 235 Q228 210 240 195 L234 188 Q220 208 204 230 Z"
+          fill="url(#hatch-dark)" />
+
+        {/* Guante Blanco Derecho Saludando */}
+        <g transform="translate(208, 155)">
+          <ellipse cx="16" cy="30" rx="10" ry="5" fill="#f5f5ef" stroke="#000000" strokeWidth="3.8" />
+          <path d="M8 26 C2 15 28 8 30 24 C31 34 16 36 8 26 Z"
+            fill="#f5f5ef" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+
+          <path d="M6 22 C-2 18 2 8 10 14 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M12 12 C10 0 20 0 20 10 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M20 10 C22 -2 30 0 28 12 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+          <path d="M27 14 C32 4 38 8 32 18 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3.2" />
+
+          <path d="M14 22 L17 28" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M19 21 L21 28" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M24 22 L24 27" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+      </g>
+
+
+      {/* CABEZA GRANDE RUBBER-HOSE FLEISCHER */}
+      <rect x="117" y="184" width="26" height="24" rx="4" fill="#f5f5ef" stroke="#000000" strokeWidth="4.5" />
+      <rect x="118" y="186" width="24" height="13" fill="url(#hatch-dark)" />
+
+      <ellipse cx="130" cy="142" rx="70" ry="64" fill="#000000" />
+      <ellipse cx="130" cy="140" rx="64" ry="58" fill="#f5f5ef" stroke="#000000" strokeWidth="4.5" />
+
+      {/* Sombra de mejilla en hatching */}
+      <path d="M66 140 Q66 186 110 196 Q78 182 70 140 Z"
+        fill="url(#hatch-light)" opacity="0.85" />
+
+
+      {/* OJOS PIE-EYE CLÁSICOS FLEISCHER (Con animación de parpadeo) */}
+      <g className="animate-blink">
+        {/* Ojo Izquierdo */}
+        <g transform="translate(98, 128)">
+          <ellipse cx="0" cy="0" rx="17" ry="21" fill="#ffffff" stroke="#000000" strokeWidth="4" />
+          <ellipse cx="2" cy="2" rx="12" ry="16" fill="#000000" />
+          {/* Pie Cutout (triángulo blanco en pupila) */}
+          <polygon points="2,2 -7,-9 6,-11" fill="#ffffff" />
+          <circle cx="5" cy="7" r="2.5" fill="#ffffff" />
+        </g>
+
+        {/* Ojo Derecho */}
+        <g transform="translate(152, 128)">
+          <ellipse cx="0" cy="0" rx="17" ry="21" fill="#ffffff" stroke="#000000" strokeWidth="4" />
+          <ellipse cx="-2" cy="2" rx="12" ry="16" fill="#000000" />
+          <polygon points="-2,2 -11,-9 2,-11" fill="#ffffff" />
+          <circle cx="1" cy="7" r="2.5" fill="#ffffff" />
+        </g>
+      </g>
+
+      {/* Cejas Gruesas Expresivas */}
+      <path d="M80 102 Q100 92 120 102" stroke="#000000" strokeWidth="6" strokeLinecap="round" fill="none" />
+      <path d="M140 102 Q160 92 180 102" stroke="#000000" strokeWidth="6" strokeLinecap="round" fill="none" />
+
+
+      {/* BIGOTE VINTAGE CARACTERÍSTICO */}
+      <path d="M100 152 Q115 144 130 148 Q145 144 160 152 Q168 158 164 164 Q154 160 130 162 Q106 160 96 164 Q92 158 100 152 Z"
+        fill="#000000" stroke="#000000" strokeWidth="2.5" />
+      <path d="M97 163 Q88 165 86 171 Q89 175 94 170 Z" fill="#000000" />
+      <path d="M163 163 Q172 165 174 171 Q171 175 166 170 Z" fill="#000000" />
+
+
+      {/* BOCA EXAGERADA CARTOON ANOS 30 */}
+      <g transform="translate(130, 168)">
+        <path d="M-30 0 Q0 32 30 0 Q0 40 -30 0 Z"
+          fill="#000000" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+        <path d="M-24 2 Q0 13 24 2 L22 9 Q0 18 -22 9 Z" fill="#ffffff" />
+        <line x1="0" y1="4" x2="0" y2="13" stroke="#000000" strokeWidth="1.8" />
+        <line x1="-11" y1="3" x2="-10" y2="11" stroke="#000000" strokeWidth="1.8" />
+        <line x1="11" y1="3" x2="10" y2="11" stroke="#000000" strokeWidth="1.8" />
+        <path d="M-15 22 Q0 13 15 22 Q0 36 -15 22 Z" fill="#c1272d" stroke="#000000" strokeWidth="2" />
+        <path d="M-34 -3 Q-30 5 -32 12" stroke="#000000" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        <path d="M34 -3 Q30 5 32 12" stroke="#000000" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      </g>
+
+
+      {/* SOMBRERO DE COPA BARBERO 1930s */}
+      <path d="M66 94 Q130 116 194 94 Q182 119 130 123 Q78 119 66 94 Z"
+        fill="url(#cross-hatch)" />
+
+      <ellipse cx="130" cy="92" rx="85" ry="15" fill="#141414" stroke="#000000" strokeWidth="5" />
+      <ellipse cx="130" cy="92" rx="83" ry="13" fill="url(#hatch-dark)" opacity="0.65" />
+
+      <path d="M82 40 C80 30 94 28 130 28 C166 28 180 30 178 40 L174 88 Q130 97 86 88 Z"
+        fill="#141414" stroke="#000000" strokeWidth="5" strokeLinejoin="round" />
+
+      <path d="M82 40 C80 30 94 28 115 28 L112 90 Q98 92 86 88 Z"
+        fill="url(#hatch-dark)" opacity="0.9" />
+
+      <path d="M85 76 Q130 84 175 76 L174 88 Q130 97 86 88 Z"
+        fill="#c1272d" stroke="#000000" strokeWidth="3" />
+
+      <circle cx="130" cy="28" r="5.5" fill="#f5f5ef" stroke="#000000" strokeWidth="2.5" />
     </g>
-    <path d="M115 135 L110 110" stroke="#000000" strokeWidth="3" />
-    <path d="M165 135 L170 110" stroke="#000000" strokeWidth="3" />
-
-    {/* BRAZO IZQUIERDO (Navaja recta) */}
-    <path d="M90 125 C60 120 45 90 60 70" stroke="#000000" strokeWidth="11" strokeLinecap="round" fill="none" />
-    <circle cx="60" cy="70" r="14" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-    <g transform="translate(35, 30) rotate(-30)">
-      <rect x="10" y="20" width="35" height="7" rx="3" fill="#000000" />
-      <path d="M30 15 L60 10 L62 22 L32 24 Z" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
-    </g>
-
-    {/* BRAZO DERECHO (Peine) */}
-    <path d="M190 125 C220 130 235 150 240 170" stroke="#000000" strokeWidth="11" strokeLinecap="round" fill="none" />
-    <circle cx="240" cy="170" r="14" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-    <g transform="translate(230, 140) rotate(15)">
-      <rect x="0" y="0" width="40" height="12" fill="#000000" rx="2" />
-      <line x1="4" y1="12" x2="4" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="9" y1="12" x2="9" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="14" y1="12" x2="14" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="19" y1="12" x2="19" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="24" y1="12" x2="24" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="29" y1="12" x2="29" y2="24" stroke="#000000" strokeWidth="2" />
-      <line x1="34" y1="12" x2="34" y2="24" stroke="#000000" strokeWidth="2" />
-    </g>
-
-    {/* CABEZA & ROSTRO */}
-    <circle cx="140" cy="75" r="36" fill="#ffffff" stroke="#000000" strokeWidth="3.5" />
-    <path d="M106 70 C110 45 140 42 174 65 C165 52 135 46 115 58 Z" fill="#000000" />
-    <ellipse cx="126" cy="72" rx="6" ry="9" fill="#000000" />
-    <polygon points="126,69 123,73 129,73" fill="#ffffff" />
-    <ellipse cx="154" cy="72" rx="6" ry="9" fill="#000000" />
-    <polygon points="154,69 151,73 157,73" fill="#ffffff" />
-    <path d="M120 58 Q126 53 132 58" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
-    <path d="M148 58 Q154 53 160 58" stroke="#000000" strokeWidth="3" strokeLinecap="round" />
-    <path d="M140 76 C137 81 143 81 140 76" stroke="#000000" strokeWidth="3" />
-    <path d="M116 82 Q140 106 164 82 Z" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-    <line x1="140" y1="83" x2="140" y2="94" stroke="#000000" strokeWidth="2" />
-    <line x1="128" y1="85" x2="128" y2="92" stroke="#000000" strokeWidth="1.5" />
-    <line x1="152" y1="85" x2="152" y2="92" stroke="#000000" strokeWidth="1.5" />
-    <path d="M112 80 C110 84 114 86 116 83" stroke="#000000" strokeWidth="2" />
-    <path d="M168 80 C170 84 166 86 164 83" stroke="#000000" strokeWidth="2" />
-
-    {/* CUELLO & MOÑO NEGRO */}
-    <rect x="132" y="108" width="16" height="10" fill="#000000" />
-    <polygon points="140,113 120,103 120,123" fill="#000000" />
-    <polygon points="140,113 160,103 160,123" fill="#000000" />
-    <circle cx="140" cy="113" r="4" fill="#ffffff" stroke="#000000" strokeWidth="2" />
   </svg>
 )
 
 export default function HomePage() {
+  const { user, loginWithGoogle } = useAuth()
+
   const { data: serviciosData } = useQuery({
-    queryKey: ['servicios-home'],
+    queryKey: ['servicios-populares'],
     queryFn: () => serviciosApi.getAll(),
-    select: (res) => res.data.servicios,
+    select: (res) => res.data.servicios.filter((s: any) => s.popular).slice(0, 3),
   })
-
-  const { data: barberosData } = useQuery({
-    queryKey: ['barberos-home'],
-    queryFn: () => barberosApi.getAll(),
-    select: (res) => res.data.barberos,
-  })
-
-  const serviciosList = serviciosData || [
-    { id: '1', nombre: 'Corte Clásico', descripcion: 'Tijera y máquina, peinado con pomada y acabado impecable.', precio: 35000, duracionMinutos: 45 },
-    { id: '2', nombre: 'Afeitado a Navaja', descripcion: 'Toalla caliente, aceites y navaja al viejo estilo.', precio: 30000, duracionMinutos: 30 },
-    { id: '3', nombre: 'Barba de Época', descripcion: 'Perfilado, recorte y aceite para una barba de caballero.', precio: 25000, duracionMinutos: 30 },
-    { id: '4', nombre: 'El Combo Dorado', descripcion: 'Corte, afeitado y barba. El tratamiento completo.', precio: 55000, duracionMinutos: 75 },
-  ]
-
-  const barberosList = barberosData || [
-    { id: 'b1', usuario: { nombre: 'Don Alfonso' }, especialidad: 'MAESTRO BARBERO', anosOficio: '40 años de oficio' },
-    { id: 'b2', usuario: { nombre: 'El Zurdo' }, especialidad: 'ESPECIALISTA EN NAVAJA', anosOficio: 'Manos de seda' },
-    { id: 'b3', usuario: { nombre: 'Tito Vals' }, especialidad: 'DISEÑO DE BARBA', anosOficio: 'Estilo a medida' },
-  ]
 
   return (
-    <div className="bg-[#eae5d8] text-[#1a1a1a]">
-      {/* ═════════════════════════════════════════════════════════════════════
-          SECCIÓN 1: HERO
-          ═════════════════════════════════════════════════════════════════════ */}
-      <section className="pt-12 pb-16 md:pt-16 md:pb-20 px-4 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-          <div className="md:col-span-7">
-            <div className="inline-block border-2 border-black px-3.5 py-1 font-mono text-xs font-bold tracking-[0.2em] uppercase mb-6 bg-transparent">
-              EST. 2019 · CABALLEROS
-            </div>
+    <div style={{ backgroundColor: 'var(--gray-900)', color: 'var(--white)' }}>
 
-            <h1
-              className="text-5xl md:text-7xl font-bold text-black leading-[1.05] mb-6"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Un corte de otra época
-            </h1>
+      {/* ═══════════════════════════════════════════════════════
+          HERO — Iluminación cinematográfica dura + Personaje Rubber Hose 1930s
+          ═══════════════════════════════════════════════════════ */}
+      <section
+        className="relative min-h-[90vh] flex items-center overflow-hidden"
+        style={{
+          background: `
+            radial-gradient(ellipse 65% 75% at 30% 50%,
+              #2a2a2a 0%,
+              #1a1a1a 35%,
+              #111111 60%,
+              #080808 100%
+            )
+          `,
+        }}
+      >
+        <div className="vignette-hard" />
 
-            <p className="font-mono text-sm md:text-base text-black/80 max-w-lg mb-8 leading-relaxed">
-              Afeitado a navaja, toallas calientes y cortes clásicos servidos con el encanto de los dibujos animados de los años treinta.
-            </p>
+        {/* Trama de fondo tipo fotograma / celuloide */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                90deg,
+                rgba(255,255,255,0.015) 0px,
+                rgba(255,255,255,0.015) 1px,
+                transparent 1px,
+                transparent 18px
+              ),
+              repeating-linear-gradient(
+                0deg,
+                rgba(255,255,255,0.01) 0px,
+                rgba(255,255,255,0.01) 1px,
+                transparent 1px,
+                transparent 24px
+              )
+            `,
+          }}
+        />
 
-            <div className="flex flex-wrap gap-4">
-              <Link to="/reservar" className="btn-vintage-black py-3.5 px-7">
-                AGENDAR MI CITA
-              </Link>
-              <a href="#servicios" className="btn-vintage-outline py-3.5 px-7">
-                VER SERVICIOS
-              </a>
-            </div>
-          </div>
+        {/* Película con rayones sutiles (Scratches) */}
+        <div
+          className="absolute inset-0 pointer-events-none animate-film-jitter"
+          style={{
+            backgroundImage: `
+              linear-gradient(
+                180deg,
+                transparent 0%,
+                rgba(255,255,255,0.035) 12%,
+                transparent 12.1%,
+                transparent 47%,
+                rgba(255,255,255,0.025) 47.1%,
+                transparent 47.3%,
+                transparent 73%,
+                rgba(255,255,255,0.03) 73.1%,
+                transparent 73.3%,
+                transparent 100%
+              )
+            `,
+          }}
+        />
 
-          <div className="md:col-span-5">
-            <div className="bg-[#f4efe4] border-2 border-black p-6 shadow-[10px_10px_0_#000] relative">
-              <BarberMascotSVG />
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* Contenido del hero */}
+        <div className="page-container relative z-10 py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
-      {/* ── MARQUEE INFERIOR HERO ── */}
-      <div className="bg-black text-white py-3.5 border-t-2 border-b-2 border-black font-mono text-xs tracking-[0.25em] uppercase text-center overflow-hidden">
-        <div className="flex items-center justify-center gap-6 whitespace-nowrap">
-          <span>CORTES CLÁSICOS</span>
-          <span className="text-white">★</span>
-          <span>AFEITADO A NAVAJA</span>
-          <span className="text-white">★</span>
-          <span>ARREGLO DE BARBA</span>
-          <span className="text-white">★</span>
-          <span>TOALLA CALIENTE</span>
-        </div>
-      </div>
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          SECCIÓN 2: LA CARTA - SERVICIOS DE LA CASA
-          ═════════════════════════════════════════════════════════════════════ */}
-      <section id="servicios" className="py-20 px-4 max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <span className="font-mono text-xs tracking-[0.3em] uppercase text-black/60 block mb-2">
-            LA CARTA
-          </span>
-          <h2
-            className="text-4xl md:text-5xl font-bold text-black"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Servicios de la casa
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {serviciosList.slice(0, 4).map((s: any, idx: number) => (
-            <div key={s.id} className="card-servicio-vintage">
-              <div className="flex items-start justify-between gap-4">
-                <h3
-                  className="text-2xl font-bold text-black"
-                  style={{ fontFamily: 'var(--font-display)' }}
+            {/* ── Texto hero (7 cols en escritorio) ── */}
+            <div className="lg:col-span-7">
+              {/* Eyebrow */}
+              <div
+                className="inline-flex items-center gap-2.5 mb-7"
+                style={{
+                  background: 'var(--gray-800)',
+                  border: '2.5px solid var(--gray-600)',
+                  boxShadow: '4px 4px 0 var(--black)',
+                  padding: '0.4rem 1rem',
+                  borderRadius: 'var(--radius-sm)',
+                }}
+              >
+                <span style={{ color: 'var(--accent-red)' }}>◆</span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-label)',
+                    fontSize: '0.78rem',
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'var(--white)',
+                    fontWeight: 600,
+                  }}
                 >
-                  {s.nombre}
-                </h3>
-                <div className="text-right">
-                  <span className="font-mono text-[0.65rem] text-black/40 block leading-none font-bold">
-                    0{idx + 1}
-                  </span>
-                  <span
-                    className="text-3xl font-bold text-black leading-none"
-                    style={{ fontFamily: 'var(--font-display)' }}
-                  >
-                    ${s.precio ? (s.precio > 1000 ? Math.round(s.precio / 1000) : s.precio) : 35}
-                  </span>
-                </div>
+                  Villa del Rosario, Colombia — Desde 2019
+                </span>
+                <span style={{ color: 'var(--accent-red)' }}>◆</span>
               </div>
 
-              <div className="border-b-2 border-dotted border-black/40 my-4" />
+              {/* Título principal — Ultra slab serif con contorno de tinta */}
+              <h1
+                className="animate-fadeInUp"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  lineHeight: 1.0,
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <span
+                  className="block text-ink-outline"
+                  style={{
+                    fontSize: 'clamp(3.2rem, 8vw, 6.8rem)',
+                    color: 'var(--white)',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  BARBERÍA
+                </span>
+                <span
+                  className="block"
+                  style={{
+                    fontSize: 'clamp(3.8rem, 9.5vw, 8.5rem)',
+                    color: 'var(--accent-red)',
+                    letterSpacing: '0.04em',
+                    textShadow: `
+                      4px 4px 0 #6a0e11,
+                      -2px -2px 0 var(--black),
+                      2px -2px 0 var(--black),
+                      -2px 2px 0 var(--black)
+                    `,
+                  }}
+                >
+                  DENVER
+                </span>
+              </h1>
 
-              <p className="font-mono text-xs text-black/80 leading-relaxed mb-4">
-                {s.descripcion}
+              <p
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontStyle: 'italic',
+                  color: 'var(--gray-300)',
+                  fontSize: '1.1rem',
+                  lineHeight: 1.7,
+                  maxWidth: '44ch',
+                  marginBottom: '2.5rem',
+                  borderLeft: '3.5px solid var(--accent-red)',
+                  paddingLeft: '1.2rem',
+                }}
+              >
+                Cortes clásicos a navaja, perfilado de barba y toalla caliente —
+                la vieja guardia del oficio en Villa del Rosario.
               </p>
 
-              <div className="border-b-2 border-dotted border-black/40 my-4" />
-
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[0.7rem] font-bold text-black/70 uppercase tracking-widest">
-                  DURACIÓN · {s.duracionMinutos || 45} MIN
-                </span>
-                <Link to="/reservar" className="btn-vintage-black py-2 px-4 text-xs">
-                  RESERVAR
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 mb-10">
+                <Link
+                  to="/reservar"
+                  className="btn btn-primary"
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget
+                    el.classList.add('animate-squash')
+                    el.addEventListener('animationend', () => el.classList.remove('animate-squash'), { once: true })
+                  }}
+                >
+                  <CalendarInkSVG size={18} />
+                  Reservar turno
+                </Link>
+                <Link to="/servicios" className="btn btn-secondary">
+                  Ver catálogo
+                  <ChevronRight size={16} />
                 </Link>
               </div>
-            </div>
-          ))}
-        </div>
 
-        <div className="text-center mt-12">
-          <Link to="/servicios" className="btn-vintage-outline py-3.5 px-8">
-            VER TODOS LOS SERVICIOS
-          </Link>
+              {/* Social proof */}
+              <div
+                className="inline-flex items-center gap-5"
+                style={{
+                  background: 'var(--gray-800)',
+                  border: '2.5px solid var(--gray-700)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.65rem 1.3rem',
+                  boxShadow: '4px 4px 0 var(--black)',
+                }}
+              >
+                <div className="flex flex-col">
+                  <div className="flex gap-0.5" style={{ color: 'var(--white)' }}>
+                    <StarInkSVG filled size={16} />
+                    <StarInkSVG filled size={16} />
+                    <StarInkSVG filled size={16} />
+                    <StarInkSVG filled size={16} />
+                    <StarInkSVG filled size={16} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-label)', fontSize: '0.72rem', color: 'var(--gray-400)', letterSpacing: '0.08em' }}>
+                    4.9 / 5.0 — Calificación
+                  </span>
+                </div>
+                <div style={{ width: '2px', height: '34px', background: 'var(--gray-700)' }} />
+                <div className="flex items-center gap-2.5">
+                  <Users size={18} style={{ color: 'var(--gray-300)' }} />
+                  <div className="flex flex-col">
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--white)', lineHeight: 1 }}>+500</span>
+                    <span style={{ fontFamily: 'var(--font-label)', fontSize: '0.68rem', color: 'var(--gray-400)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Clientes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Mascota Fleischer Rubber Hose (5 cols - VISIBLE EN TODOS LOS TAMAÑOS) ── */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center relative mt-8 lg:mt-0">
+              {/* Halo de luz cinematográfica */}
+              <div
+                className="absolute"
+                style={{
+                  width: '380px',
+                  height: '380px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(120,120,120,0.22) 0%, transparent 70%)',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Polos de barbería decorativos */}
+              <div className="absolute -left-2 top-4 hidden sm:block" style={{ color: 'var(--gray-600)', opacity: 0.8 }}>
+                <BarberPoleSVG />
+              </div>
+              <div className="absolute -right-2 top-4 hidden sm:block" style={{ color: 'var(--gray-600)', opacity: 0.8 }}>
+                <BarberPoleSVG />
+              </div>
+
+              {/* Marco de película vintage / Cartel para la mascota */}
+              <div
+                className="relative p-4 rounded"
+                style={{
+                  background: 'radial-gradient(circle, var(--gray-800) 0%, var(--gray-900) 100%)',
+                  border: '3.5px solid var(--white)',
+                  boxShadow: '6px 6px 0 var(--black), -1px -1px 0 var(--gray-700)',
+                  maxWidth: '340px',
+                  width: '100%',
+                }}
+              >
+                {/* Esquinas ornamentales estilo cartel 1930s */}
+                <div style={{ position: 'absolute', top: 4, left: 6, fontSize: '0.8rem', color: 'var(--accent-red)' }}>✦</div>
+                <div style={{ position: 'absolute', top: 4, right: 6, fontSize: '0.8rem', color: 'var(--accent-red)' }}>✦</div>
+                <div style={{ position: 'absolute', bottom: 4, left: 6, fontSize: '0.8rem', color: 'var(--accent-red)' }}>✦</div>
+                <div style={{ position: 'absolute', bottom: 4, right: 6, fontSize: '0.8rem', color: 'var(--accent-red)' }}>✦</div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    height: '420px',
+                  }}
+                >
+                  <BarberMascotSVG />
+                </div>
+
+                {/* Letrero vintage del personaje */}
+                <div
+                  style={{
+                    fontFamily: 'var(--font-label)',
+                    fontSize: '0.8rem',
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'var(--white)',
+                    textAlign: 'center',
+                    marginTop: '0.5rem',
+                    borderTop: '2px dashed var(--gray-600)',
+                    paddingTop: '0.6rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  ✦ EL MAESTRO SÁNCHEZ ✦
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          SECCIÓN 3: LA CUADRILLA - NUESTROS BARBEROS
-          (Fondo pergamino tonal cálido #ded8c7 en lugar de negro plano)
-          ═════════════════════════════════════════════════════════════════════ */}
-      <section id="barberos" className="bg-[#ded8c7] border-t-2 border-b-2 border-black py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-14">
-            <div>
-              <span className="font-mono text-xs tracking-[0.3em] uppercase text-black/60 block mb-2">
-                LA CUADRILLA
-              </span>
-              <h2
-                className="text-4xl md:text-5xl font-bold text-black"
-                style={{ fontFamily: 'var(--font-display)' }}
+      {/* ═══════════════════════════════════════════════════════
+          STATS — Panel de cómic horizontal
+          ═══════════════════════════════════════════════════════ */}
+      <section
+        style={{
+          background: 'var(--gray-800)',
+          borderTop: '3px solid var(--gray-700)',
+          borderBottom: '3px solid var(--gray-700)',
+        }}
+      >
+        <div className="page-container py-10">
+          <div className="grid grid-cols-3 gap-0 text-center">
+            {[
+              {
+                value: '4.9',
+                label: 'Estrellas',
+                icon: <StarInkSVG filled size={22} />,
+              },
+              {
+                value: '8+',
+                label: 'Servicios',
+                icon: <ScissorsSVG size={22} />,
+              },
+              {
+                value: '5',
+                label: 'Años de oficio',
+                icon: <CalendarInkSVG size={22} />,
+              },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className="flex flex-col items-center gap-2 py-4"
+                style={{
+                  borderRight: i < 2 ? '2px solid var(--gray-700)' : 'none',
+                }}
               >
-                Nuestros barberos
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    border: '2.5px solid var(--gray-600)',
+                    borderRadius: 'var(--radius-sm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--gray-900)',
+                    boxShadow: '3px 3px 0 var(--black)',
+                    color: 'var(--gray-300)',
+                  }}
+                >
+                  {stat.icon}
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+                    color: 'var(--white)',
+                    lineHeight: 1,
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-label)',
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'var(--gray-500)',
+                  }}
+                >
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          SERVICIOS POPULARES
+          ═══════════════════════════════════════════════════════ */}
+      {serviciosData && serviciosData.length > 0 && (
+        <section className="py-20">
+          <div className="page-container">
+            <div className="text-center mb-14">
+              <div className="divider-ornament justify-center mb-5">
+                <Award size={18} style={{ color: 'var(--gray-400)' }} />
+              </div>
+              <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--white)' }}>
+                Servicios Populares
               </h2>
+              <p
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontStyle: 'italic',
+                  color: 'var(--gray-500)',
+                  marginTop: '0.5rem',
+                }}
+              >
+                Los cortes más solicitados en la silla del maestro
+              </p>
             </div>
-            <div className="hidden sm:flex w-12 h-12 border-2 border-black bg-[#eae5d8] items-center justify-center font-mono font-bold text-xl text-black shadow-[3px_3px_0_#000]">
-              ✂
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {serviciosData.map((s: any) => (
+                <ServicioCard key={s.id} servicio={s} />
+              ))}
+            </div>
+
+            <div className="text-center">
+              <Link to="/servicios" className="btn btn-secondary">
+                Catálogo completo
+                <ChevronRight size={16} />
+              </Link>
             </div>
           </div>
+        </section>
+      )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {barberosList.map((b: any) => {
-              const nombreBarbero = b.usuario?.nombre || b.nombre || 'Barbero'
-              const inicial = nombreBarbero.charAt(0).toUpperCase()
-              return (
-                <div key={b.id} className="card-barbero-vintage bg-[#eae5d8] shadow-[5px_5px_0_#000]">
-                  <div className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center mb-5 border-2 border-black shadow-[2px_2px_0_#000]">
-                    <span
-                      className="text-3xl font-bold font-mono"
-                      style={{ fontFamily: 'var(--font-display)' }}
-                    >
-                      {inicial}
-                    </span>
-                  </div>
+      {/* ═══════════════════════════════════════════════════════
+          CÓMO FUNCIONA — Paneles de cómic verticales
+          ═══════════════════════════════════════════════════════ */}
+      <section
+        style={{
+          borderTop: '3px solid var(--gray-700)',
+          background: `
+            linear-gradient(180deg, var(--gray-900) 0%, var(--gray-800) 100%)
+          `,
+        }}
+        className="py-20"
+      >
+        <div className="page-container">
+          <div className="text-center mb-14">
+            <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--white)' }}>
+              ¿Cómo Reservar?
+            </h2>
+            <p style={{ fontFamily: 'var(--font-heading)', fontStyle: 'italic', color: 'var(--gray-500)', marginTop: '0.5rem' }}>
+              Tres pasos. Sin complicaciones. A la antigua usanza.
+            </p>
+          </div>
 
-                  <h3
-                    className="text-2xl font-bold text-black mb-1"
-                    style={{ fontFamily: 'var(--font-display)' }}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+            {[
+              {
+                num: '01',
+                title: 'Elige tu corte',
+                desc: 'Clásico fade, perfilado de barba, combo completo o tratamiento premium. El catálogo habla solo.',
+                icon: <ScissorsSVG size={32} />,
+              },
+              {
+                num: '02',
+                title: 'Elige tu barbero',
+                desc: 'Selecciona al maestro de tu confianza y consulta su disponibilidad en tiempo real.',
+                icon: <BarberPoleSVG />,
+              },
+              {
+                num: '03',
+                title: 'Confirma tu hora',
+                desc: 'Escoge la fecha y el horario. El pago se efectúa directamente en caja al finalizar el servicio.',
+                icon: <CalendarInkSVG size={32} />,
+              },
+            ].map((step, i) => (
+              <div
+                key={step.num}
+                className="card flex flex-col"
+                style={{
+                  borderRadius: 'var(--radius-sm)',
+                  borderRight: i < 2 ? 'none' : undefined,
+                  marginRight: i < 2 ? '-1px' : '0',
+                  zIndex: 3 - i,
+                }}
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '3.5rem',
+                      lineHeight: 0.9,
+                      color: 'var(--gray-700)',
+                      userSelect: 'none',
+                    }}
                   >
-                    {nombreBarbero}
-                  </h3>
-
-                  <p className="font-mono text-[0.7rem] font-bold text-black/70 uppercase tracking-[0.18em] mb-3">
-                    {b.especialidad || 'BARBERO PROFESIONAL'}
-                  </p>
-
-                  <p className="font-mono text-xs text-black/80 mb-6">
-                    {b.anosOficio || 'Especialista en corte clásico & navaja'}
-                  </p>
-
-                  <Link to="/reservar" className="btn-vintage-black w-full py-3 text-xs">
-                    RESERVAR CITA
-                  </Link>
+                    {step.num}
+                  </span>
+                  <div
+                    style={{
+                      width: '52px',
+                      height: '52px',
+                      border: '2.5px solid var(--gray-600)',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'var(--gray-900)',
+                      boxShadow: '3px 3px 0 var(--black)',
+                      color: 'var(--gray-300)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {step.icon}
+                  </div>
                 </div>
-              )
-            })}
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 700,
+                    fontSize: '1.25rem',
+                    color: 'var(--white)',
+                    marginBottom: '0.6rem',
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', color: 'var(--gray-400)', lineHeight: 1.65 }}>
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            {user ? (
+              <Link to="/reservar" className="btn btn-primary">
+                <CalendarInkSVG size={18} />
+                Reservar turno ahora
+              </Link>
+            ) : (
+              <button onClick={loginWithGoogle} className="btn btn-primary">
+                Iniciar sesión para reservar
+              </button>
+            )}
           </div>
         </div>
       </section>

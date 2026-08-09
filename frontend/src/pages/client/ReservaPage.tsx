@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, Loader2, Star, Clock, Scissors } from 'lucide-react'
 import { format, addDays, isBefore, startOfDay } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { barberosApi, citasApi, serviciosApi } from '@/lib/api'
 import { useReservaStore } from '@/store/reservaStore'
 import { useAuth } from '@/contexts/AuthContext'
-import { formatCOP } from '@/lib/utils'
+import StepIndicator from '@/components/client/StepIndicator'
+import { formatCOP, formatDate } from '@/lib/utils'
+import ServicioCard from '@/components/client/ServicioCard'
 
 const TODAY = startOfDay(new Date())
 const MAX_DAYS_AHEAD = 30
@@ -38,14 +40,16 @@ export default function ReservaPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(addDays(TODAY, 1))
   const fechaStr = format(selectedDate, 'yyyy-MM-dd')
 
-  const { data: disponibilidad, isLoading: loadingSlots } = useQuery({
+  const { data: disponibilidad, isLoading: loadingSlots, refetch: refetchSlots } = useQuery({
     queryKey: ['disponibilidad', barbero?.id, fechaStr, servicio?.id],
     queryFn: () => barberosApi.getDisponibilidad(barbero!.id, fechaStr, servicio!.id),
     select: (res) => res.data,
     enabled: paso === 3 && !!barbero && !!servicio,
   })
 
-  const slots: string[] = disponibilidad?.slots || ['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00']
+  const slots: string[] = disponibilidad?.slots || []
+  const mañana = slots.filter((s) => s < '12:00')
+  const tarde = slots.filter((s) => s >= '12:30')
 
   // ── Crear Cita Mutation ─────────────────────────────────────
   const { mutate: crearCita, isPending: creandoCita, error: errorCita } = useMutation({
@@ -70,6 +74,7 @@ export default function ReservaPage() {
     crearCita()
   }
 
+  // ── Navigate days ───────────────────────────────────────────
   const prevDay = () => {
     const prev = addDays(selectedDate, -1)
     if (!isBefore(prev, addDays(TODAY, 1))) {
@@ -95,62 +100,52 @@ export default function ReservaPage() {
   }, [paso])
 
   return (
-    <div className="bg-[#eae5d8] min-h-screen py-16 text-[#1a1a1a]">
-      <div className="max-w-3xl mx-auto px-4">
-        {/* Header estilo Foto 4 */}
-        <div className="text-center mb-10">
-          <span className="font-mono text-xs tracking-[0.3em] uppercase text-black/60 block mb-2">
-            RESERVA TU LUGAR
-          </span>
-          <h1
-            className="text-4xl md:text-5xl font-bold text-black"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Agenda tu cita
-          </h1>
+    <div className="py-16 min-h-screen">
+      <div className="page-container max-w-4xl">
+        <div className="text-center mb-8">
+          <h1 style={{ color: 'var(--color-cream)' }}>Reservar cita</h1>
+          <p className="text-[var(--color-gray)] mt-2">
+            {paso === 1 && 'Selecciona el servicio que deseas'}
+            {paso === 2 && 'Elige tu barbero'}
+            {paso === 3 && 'Confirma día y hora'}
+          </p>
         </div>
 
-        {/* ── PASO 1: Seleccionar Servicio ──────────────────────── */}
+        <StepIndicator pasoActual={paso} />
+
+        {/* ── PASO 1: Seleccionar servicio ──────────────────── */}
         {paso === 1 && (
-          <div className="space-y-6">
-            <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-black text-center mb-6">
-              1. SELECCIONA EL SERVICIO
-            </h2>
+          <div className="animate-fadeInUp">
             {loadingServicios ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-44 bg-[#e2ded2] animate-pulse border-2 border-black" />
+                  <div key={i} className="h-64 skeleton rounded-xl" />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-5">
-                {serviciosData?.map((s: any, idx: number) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {serviciosData?.map((s: any) => (
                   <div
                     key={s.id}
                     onClick={() => { setServicio(s); setPaso(2) }}
-                    className="card-servicio-vintage cursor-pointer"
+                    className={`card cursor-pointer border-2 transition-all ${
+                      servicio?.id === s.id
+                        ? 'border-[var(--color-red)] shadow-[0_0_0_3px_rgba(200,20,30,0.2)]'
+                        : ''
+                    }`}
                   >
-                    {/* Fila superior: nombre + precio */}
-                    <div className="flex items-start justify-between gap-4 min-w-0">
-                      <h3
-                        className="text-xl font-bold text-black leading-tight min-w-0 flex-1"
-                        style={{ fontFamily: 'var(--font-display)' }}
-                      >
-                        {s.nombre}
-                      </h3>
-                      <span
-                        className="text-xl font-bold text-black whitespace-nowrap flex-shrink-0"
-                        style={{ fontFamily: 'var(--font-display)' }}
-                      >
-                        {formatCOP(s.precio)}
-                      </span>
-                    </div>
-                    <div className="border-b-2 border-dotted border-black/40 my-3" />
-                    <div className="flex items-end justify-between gap-4">
-                      <p className="font-mono text-xs text-black/80 flex-1 leading-relaxed">{s.descripcion}</p>
-                      <span className="font-mono text-[0.65rem] font-bold text-black/70 uppercase whitespace-nowrap flex-shrink-0">
-                        {s.duracionMinutos} MIN
-                      </span>
+                    <div className="flex items-start gap-3">
+                      <span className="text-3xl">✂</span>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-[var(--color-cream)]">{s.nombre}</h3>
+                        <p className="text-sm text-[var(--color-gray)] mt-0.5">{s.descripcion.slice(0, 70)}...</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-xs text-[var(--color-gray)] flex items-center gap-1">
+                            <Clock size={11} /> {s.duracionMinutos} min
+                          </span>
+                          <span className="font-black text-[var(--color-cream)]">{formatCOP(s.precio)}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -159,129 +154,164 @@ export default function ReservaPage() {
           </div>
         )}
 
-        {/* ── PASO 2: Seleccionar Barbero ───────────────────────── */}
+        {/* ── PASO 2: Seleccionar barbero ───────────────────── */}
         {paso === 2 && (
-          <div className="space-y-6">
-            <button
-              onClick={() => setPaso(1)}
-              className="btn-vintage-outline text-xs py-2 px-4 mb-4"
-            >
-              ← VOLVER A SERVICIOS
+          <div className="animate-fadeInUp">
+            <button onClick={() => setPaso(1)} className="btn btn-ghost mb-6 flex items-center gap-1">
+              <ChevronLeft size={16} /> Volver
             </button>
-            <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-black text-center mb-6">
-              2. ELIGE TU BARBERO
-            </h2>
+
             {loadingBarberos ? (
               <div className="flex justify-center py-12">
-                <Loader2 size={32} className="animate-spin text-black" />
+                <Loader2 size={32} className="animate-spin text-[var(--color-sepia)]" />
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {barberosData?.map((b: any) => {
-                  const nombreB = b.usuario?.nombre || b.nombre || 'Barbero'
-                  const inicial = nombreB.charAt(0).toUpperCase()
-                  return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {barberosData?.map((b: any) => (
+                  <div
+                    key={b.id}
+                    onClick={() => { setBarbero(b); setPaso(3) }}
+                    className={`card cursor-pointer border-2 transition-all flex items-center gap-4 ${
+                      barbero?.id === b.id
+                        ? 'border-[var(--color-red)] shadow-[0_0_0_3px_rgba(200,20,30,0.2)]'
+                        : ''
+                    }`}
+                  >
                     <div
-                      key={b.id}
-                      onClick={() => { setBarbero(b); setPaso(3) }}
-                      className="card-barbero-vintage cursor-pointer"
+                      className="w-16 h-16 rounded-full border-2 border-[var(--color-border)] overflow-hidden flex-shrink-0 flex items-center justify-center"
+                      style={{ background: 'var(--color-bg)' }}
                     >
-                      <div className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center mb-4 border-2 border-black font-mono font-bold text-2xl">
-                        {inicial}
-                      </div>
-                      <h3
-                        className="text-xl font-bold text-black mb-1"
-                        style={{ fontFamily: 'var(--font-display)' }}
-                      >
-                        {nombreB}
-                      </h3>
-                      <p className="font-mono text-[0.65rem] font-bold text-black/70 uppercase">
-                        {b.especialidad || 'BARBERO'}
-                      </p>
+                      {b.fotoUrl ? (
+                        <img src={b.fotoUrl} alt={b.nombre} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">💈</span>
+                      )}
                     </div>
-                  )
-                })}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-[var(--color-cream)]">{b.nombre}</h3>
+                      <p className="text-sm text-[var(--color-gray)]">{b.especialidad}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Star size={12} fill="#c8a96e" className="text-[var(--color-sepia)]" />
+                        <span className="text-sm font-semibold text-[var(--color-sepia)]">
+                          {b.calificacionPromedio || 'Nuevo'}
+                        </span>
+                        {b.totalResenas > 0 && (
+                          <span className="text-xs text-[var(--color-gray)]">({b.totalResenas} reseñas)</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         )}
 
-        {/* ── PASO 3: Confirmar Fecha y Hora (Foto 4) ──────────── */}
+        {/* ── PASO 3: Seleccionar horario ───────────────────── */}
         {paso === 3 && (
-          <div className="bg-[#eae5d8] border-2 border-black p-6 md:p-10 shadow-[8px_8px_0_#000]">
-            <button
-              onClick={() => setPaso(2)}
-              className="btn-vintage-outline text-xs py-1.5 px-3 mb-6"
-            >
-              ← CAMBIAR SELECCIÓN
+          <div className="animate-fadeInUp">
+            <button onClick={() => setPaso(2)} className="btn btn-ghost mb-6 flex items-center gap-1">
+              <ChevronLeft size={16} /> Volver
             </button>
 
-            {/* Resumen de Selección */}
-            <div className="border-2 border-black bg-[#f4efe4] p-5 mb-8 flex flex-col sm:flex-row justify-between gap-4 font-mono text-xs">
-              <div>
-                <span className="text-black/50 block font-bold">SERVICIO SELECCIONADO</span>
-                <span className="text-black font-bold text-base">{servicio?.nombre}</span>
-                <span className="block text-black/70">{formatCOP(servicio?.precio || 0)}</span>
+            {/* Resumen */}
+            <div className="card mb-6 flex flex-wrap gap-4 items-center">
+              <div className="flex-1">
+                <p className="text-xs text-[var(--color-gray)] uppercase tracking-wider mb-1">Servicio</p>
+                <p className="font-bold text-[var(--color-cream)]">{servicio?.nombre}</p>
+                <p className="text-sm text-[var(--color-sepia)]">{formatCOP(servicio?.precio || 0)}</p>
               </div>
-              <div className="sm:text-right border-t sm:border-t-0 sm:border-l border-black/20 pt-3 sm:pt-0 sm:pl-4">
-                <span className="text-black/50 block font-bold">BARBERO</span>
-                <span className="text-black font-bold text-base">{(barbero as any)?.usuario?.nombre || barbero?.nombre}</span>
-                <span className="block text-black/70">{barbero?.especialidad}</span>
+              <div className="flex-1">
+                <p className="text-xs text-[var(--color-gray)] uppercase tracking-wider mb-1">Barbero</p>
+                <p className="font-bold text-[var(--color-cream)]">{barbero?.nombre}</p>
+                <p className="text-sm text-[var(--color-gray)]">{barbero?.especialidad}</p>
               </div>
             </div>
 
-            {/* Selector de Fecha */}
-            <div className="flex items-center justify-between mb-8 border-b-2 border-dotted border-black/40 pb-6">
-              <button onClick={prevDay} className="btn-vintage-outline p-2">
-                <ChevronLeft size={18} />
+            {/* Date picker */}
+            <div className="flex items-center justify-between mb-6">
+              <button onClick={prevDay} className="btn btn-ghost p-2">
+                <ChevronLeft size={20} />
               </button>
               <div className="text-center">
                 <p
-                  className="text-2xl font-bold capitalize text-black"
-                  style={{ fontFamily: 'var(--font-display)' }}
+                  className="text-xl font-bold capitalize"
+                  style={{ fontFamily: 'var(--font-display)', color: 'var(--color-cream)' }}
                 >
                   {format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
                 </p>
               </div>
-              <button onClick={nextDay} className="btn-vintage-outline p-2">
-                <ChevronRight size={18} />
+              <button onClick={nextDay} className="btn btn-ghost p-2">
+                <ChevronRight size={20} />
               </button>
             </div>
 
-            {/* Grid de Horarios */}
-            <div className="mb-8">
-              <label className="block font-mono text-xs font-bold uppercase tracking-wider mb-3 text-black">
-                SELECCIONA LA HORA
-              </label>
-              {loadingSlots ? (
-                <div className="flex justify-center py-6">
-                  <Loader2 size={24} className="animate-spin text-black" />
-                </div>
-              ) : (
-                <div className="grid grid-cols-4 gap-3">
-                  {slots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => setHoraInicio(slot)}
-                      className={`py-2.5 font-mono text-xs font-bold border-1.5 border-black transition-colors ${
-                        horaInicio === slot
-                          ? 'bg-black text-white'
-                          : 'bg-[#e2ded2] text-black hover:bg-black/10'
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Slots */}
+            {loadingSlots ? (
+              <div className="flex justify-center py-8">
+                <Loader2 size={28} className="animate-spin text-[var(--color-sepia)]" />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {mañana.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-sepia)] mb-3">
+                      ☀ Mañana
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {mañana.map((slot) => (
+                        <button
+                          key={slot}
+                          className={`slot-btn ${horaInicio === slot ? 'selected' : ''}`}
+                          onClick={() => setHoraInicio(slot)}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Botón Confirmar Cita (Foto 4) */}
+                {tarde.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--color-sepia)] mb-3">
+                      🌇 Tarde
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {tarde.map((slot) => (
+                        <button
+                          key={slot}
+                          className={`slot-btn ${horaInicio === slot ? 'selected' : ''}`}
+                          onClick={() => setHoraInicio(slot)}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {slots.length === 0 && (
+                  <div className="text-center py-8 text-[var(--color-gray)]">
+                    No hay horarios disponibles para este día.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Confirm */}
             {horaInicio && (
-              <div>
+              <div className="mt-8 card ink-border">
+                <p className="text-center text-sm text-[var(--color-gray)] mb-4">
+                  Confirma tu cita para el{' '}
+                  <strong className="text-[var(--color-cream)]">
+                    {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                  </strong>{' '}
+                  a las <strong className="text-[var(--color-cream)]">{horaInicio}</strong>
+                </p>
+
                 {errorCita && (
-                  <p className="text-center text-xs font-mono text-red-600 font-bold mb-4">
+                  <p className="text-center text-sm text-[var(--color-red)] mb-4">
                     ⚠ El horario seleccionado ya fue ocupado. Por favor elige otro.
                   </p>
                 )}
@@ -289,20 +319,16 @@ export default function ReservaPage() {
                 <button
                   onClick={handleConfirmar}
                   disabled={creandoCita}
-                  className="w-full bg-black text-white py-4 border-2 border-black font-mono text-xs font-bold tracking-[0.2em] uppercase shadow-[4px_4px_0_#000] hover:bg-neutral-800 transition-colors"
+                  className="btn btn-primary w-full text-base py-3"
                 >
                   {creandoCita ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 size={16} className="animate-spin" /> RESERVANDO...
-                    </span>
+                    <><Loader2 size={18} className="animate-spin" /> Reservando...</>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <Check size={16} /> CONFIRMAR CITA
-                    </span>
+                    <><Check size={18} /> Confirmar cita</>
                   )}
                 </button>
-                <p className="text-center font-mono text-[0.7rem] text-black/60 mt-3 font-bold">
-                  Pagos exclusivamente en caja el día de tu cita
+                <p className="text-center text-xs text-[var(--color-gray)] mt-3">
+                  El pago se realiza en caja el día de tu visita
                 </p>
               </div>
             )}

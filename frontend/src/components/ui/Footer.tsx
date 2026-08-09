@@ -1,34 +1,36 @@
-import { MapPin, Clock } from 'lucide-react'
+import { Scissors, MapPin, Clock } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="border-t-2 border-black bg-[#0d0d0d] text-white">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-14">
+    <footer
+      className="border-t-4 border-black bg-[#0a0a0a] mt-24 text-[var(--ink)]"
+    >
+      <div className="page-container py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center font-black text-lg font-mono border-2 border-white">
-                D
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center border-2 border-white bg-black shadow-[3px_3px_0px_#000000]">
+                <Scissors size={20} className="text-white stroke-[2.5]" />
               </div>
               <div>
                 <span
-                  className="block text-xl font-bold tracking-wider text-white"
-                  style={{ fontFamily: 'var(--font-display)' }}
+                  className="block text-xl font-black tracking-wider text-white"
+                  style={{ fontFamily: 'var(--font-title)' }}
                 >
                   BARBERÍA DENVER
                 </span>
               </div>
             </div>
-            <p className="text-xs font-mono text-white/70 leading-relaxed">
-              Cortes clásicos, toallas calientes y perfilado a navaja. El encanto de los dibujos animados de los años treinta.
+            <p className="text-sm text-[var(--ink-muted)] leading-relaxed font-medium">
+              Cortes clásicos, toallas calientes y perfilado a navaja. Estilo 1930 Fleischer Cartoon con precisión quirúrgica.
             </p>
             <a
               href="https://www.instagram.com/barberiadenver/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-4 text-xs font-mono font-bold text-white hover:underline"
+              className="inline-flex items-center gap-2 mt-5 text-sm font-extrabold text-white hover:text-[var(--accent)] transition-colors"
             >
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
@@ -42,21 +44,22 @@ export default function Footer() {
           {/* Links */}
           <div>
             <h4
-              className="text-xs font-mono font-bold uppercase tracking-widest mb-4 text-white/90"
+              className="text-sm font-black uppercase tracking-widest mb-4 text-white"
+              style={{ fontFamily: 'var(--font-title)' }}
             >
               Navegación
             </h4>
-            <ul className="space-y-2 font-mono text-xs text-white/70">
+            <ul className="space-y-2.5">
               {[
                 { to: '/', label: 'Inicio' },
                 { to: '/servicios', label: 'Servicios' },
-                { to: '/barberos', label: 'Barberos' },
                 { to: '/reservar', label: 'Reservar cita' },
+                { to: '/perfil', label: 'Mi perfil' },
               ].map((link) => (
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="hover:text-white hover:underline transition-colors"
+                    className="text-sm font-semibold text-[var(--ink-muted)] hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -68,34 +71,35 @@ export default function Footer() {
           {/* Info */}
           <div>
             <h4
-              className="text-xs font-mono font-bold uppercase tracking-widest mb-4 text-white/90"
+              className="text-sm font-black uppercase tracking-widest mb-4 text-white"
+              style={{ fontFamily: 'var(--font-title)' }}
             >
               Horarios de atención
             </h4>
-            <ul className="space-y-2.5 font-mono text-xs text-white/70">
-              <li className="flex items-center gap-2">
-                <Clock size={14} className="text-white" />
+            <ul className="space-y-3 text-sm text-[var(--ink-muted)] font-medium">
+              <li className="flex items-center gap-2.5">
+                <Clock size={16} className="text-white" />
                 <span>Lun – Vie: 9:00 a.m. – 5:00 p.m.</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Clock size={14} className="text-white" />
+              <li className="flex items-center gap-2.5">
+                <Clock size={16} className="text-white" />
                 <span>Sábado: 9:00 a.m. – 3:00 p.m.</span>
               </li>
-              <li className="flex items-center gap-2 pt-1">
-                <MapPin size={14} className="text-white" />
+              <li className="flex items-center gap-2.5 pt-2">
+                <MapPin size={16} className="text-white" />
                 <span>Villa del Rosario, Colombia</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/20 my-8"></div>
+        <div className="divider-ornament my-10">✦</div>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 font-mono text-xs text-white/60">
-          <p>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs font-semibold text-[var(--ink-muted)]">
             © {new Date().getFullYear()} Barbería Denver. Todos los derechos reservados.
           </p>
-          <p className="text-white/80 font-bold">
+          <p className="text-xs font-bold text-white">
             Pagos exclusivamente en caja • No se procesan pagos en línea
           </p>
         </div>
@@ -103,3 +107,4 @@ export default function Footer() {
     </footer>
   )
 }
+
