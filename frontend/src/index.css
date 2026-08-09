@@ -1,47 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&family=Work+Sans:wght@400;500;600;700&display=swap');
+/* ============================================================
+   BARBERÍA DENVER — Sistema de Diseño: Tinta 1930s Analógica
+   Referencia: Fleischer Studios / Cuphead B&W / Mickey Noir
+   ============================================================
+
+   REGLAS DE ARTE:
+   • Tipografía: Ultra (slab-serif cartel vodevil) + Playfair Display Italic
+   • Paleta: negro profundo + 4 grises intermedios reales + blanco hueso + rojo acento
+   • Textura: grano celuloide SVG obligatorio (12% overlay) + viñeta radial
+   • Bordes: 2-3px tipo tinta, NO border-radius>8px en componentes grandes
+   • Sombras: hard-offset 5px×5px sólido (NO difusas, NO neumorphism)
+   • Iconos: SVGs de trazo orgánico con stroke variable (NO librería uniforme)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Ultra&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Special+Elite&family=Libre+Baskerville:ital,wght@0,700;1,400&family=IBM+Plex+Mono:wght@400;600&family=Source+Sans+3:wght@400;600;700&display=swap');
 
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════════════════════
-   BARBERÍA DENVER — Fleischer 1930s Rubber Hose B&W Design System
-   Estilo: Caricatura Clásica Blanco y Negro (Popeye 1930s / Steamboat Willie / Cuphead)
-   ═══════════════════════════════════════════════════════════ */
-
 @layer base {
   :root {
-    /* ── Palette ────────────────────────────────────────── */
-    --bg-base:       #0a0a0a;        /* negro casi puro */
-    --bg-surface:    #141414;        /* superficies/tarjetas */
-    --ink:           #f5f5f0;        /* blanco hueso */
-    --ink-muted:     #b8b8b0;        /* texto secundario gris claro */
-    --line:          #ffffff;        /* contornos tipo tinta */
-    --accent:        #d61f26;        /* rojo puro "cartel de circo" SOLO CTAs */
-    --accent-hover:  #b8191f;        /* hover para accent */
-    --grain-opacity: 0.06;           /* textura grano de película */
+    /* ── Paleta Real de Tinta — NUNCA usar solo negro/blanco plano ── */
+    --black:        #0d0d0d;    /* negro tinta, no #000 puro */
+    --gray-900:     #1a1a1a;    /* fondo de página */
+    --gray-800:     #242424;    /* fondo de superficie/tarjeta */
+    --gray-700:     #3d3d3d;    /* bordes oscuros, sombreado trama */
+    --gray-600:     #525252;    /* sombras intermedias de ilustración */
+    --gray-500:     #6b6b6b;    /* texto terciario, hatching suave */
+    --gray-400:     #8c8c87;    /* texto secundario apagado */
+    --gray-300:     #a8a8a0;    /* separadores, detalles finos */
+    --gray-100:     #d4d4cc;    /* gris claro, fondos alternos */
+    --white:        #f5f5ef;    /* blanco hueso envejecido, NO #fff puro */
+    --paper:        #e8e4d8;    /* tono papel viejo (para secciones de contraste) */
+    --accent-red:   #c1272d;    /* rojo cartel de circo, SOLO CTAs principales */
+    --accent-red-dark: #9a1f24; /* hover del rojo */
 
-    /* Legacy system compatibility */
-    --color-bg:      var(--bg-base);
-    --color-bg-card: var(--bg-surface);
-    --color-cream:   var(--ink);
-    --color-sepia:   #ffffff;
-    --color-sepia-dk: #999990;
-    --color-red:     var(--accent);
-    --color-red-dk:  var(--accent-hover);
-    --color-white:   #ffffff;
-    --color-gray:    var(--ink-muted);
-    --color-border:  #282828;
-    --color-ink:     #0a0a0a;
+    /* ── Aliases internos para compatibilidad ── */
+    --bg-base:       var(--gray-900);
+    --bg-surface:    var(--gray-800);
+    --ink:           var(--white);
+    --ink-muted:     var(--gray-400);
+    --line:          var(--white);
+    --accent:        var(--accent-red);
+    --accent-hover:  var(--accent-red-dark);
+    --color-bg:      var(--gray-900);
+    --color-bg-card: var(--gray-800);
+    --color-cream:   var(--white);
+    --color-sepia:   var(--gray-300);
+    --color-sepia-dk: var(--gray-500);
+    --color-red:     var(--accent-red);
+    --color-red-dk:  var(--accent-red-dark);
+    --color-white:   var(--white);
+    --color-gray:    var(--gray-400);
+    --color-border:  var(--gray-700);
+    --color-ink:     var(--black);
 
-    /* ── Typography ────────────────────────────────────── */
-    --font-display:  'Bungee', 'Bebas Neue', display, sans-serif;
-    --font-title:    'Bungee', 'Bebas Neue', sans-serif;
-    --font-body:     'Inter', 'Work Sans', sans-serif;
+    /* ── Tipografía Vodevil 1930s — SIN fuentes bubble/redondeadas ── */
+    --font-display:  'Ultra', 'Playfair Display', 'Georgia', serif;
+    --font-heading:  'Playfair Display', 'Georgia', serif;
+    --font-label:    'Special Elite', 'Libre Baskerville', serif;
+    --font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+    --font-body:     'Source Sans 3', 'Georgia', serif;
+    --font-title:    'Ultra', 'Playfair Display', serif;
 
-    /* ── Sizing & Radius ───────────────────────────────── */
-    --radius-sm:     4px;
-    --radius-md:     8px;
-    --radius-lg:     12px;
-    --radius-xl:     20px;
+    /* ── Sizing — esquinas mínimas, aspecto "dibujado" ── */
+    --radius-sm:   2px;
+    --radius-md:   4px;
+    --radius-lg:   6px;
+    --radius-xl:   8px;
+
+    /* ── Texturas ── */
+    --grain-opacity:   0.12;
+    --vignette-power:  0.88;
   }
 
   * {
@@ -53,294 +81,396 @@
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    /* Sin anti-aliasing agresivo = aspecto más "impreso" */
+    text-rendering: optimizeLegibility;
   }
 
+  /* ── Fondo base con textura sutil ── */
   body {
-    background-color: var(--bg-base);
-    color: var(--ink);
+    background-color: var(--gray-900);
+    color: var(--white);
     font-family: var(--font-body);
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.65;
     position: relative;
     min-height: 100vh;
   }
 
-  /* 1930s Film grain overlay texture */
+  /* ── CAPA 1: Grano de Celuloide/Película — OBLIGATORIA ──
+     Simula el grano real de película de 35mm de los años 30.
+     Opacidad 12% en overlay produce una textura claramente visible
+     sin afectar legibilidad (WCAG AA se mantiene). */
   body::before {
     content: '';
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    inset: 0;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 9000;
     opacity: var(--grain-opacity);
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* SVG con turbulencia fractal — simula grano de celuloide */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.72' numOctaves='4' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23grain)' opacity='1'/%3E%3C/svg%3E");
     background-repeat: repeat;
-    background-size: 90px 90px;
+    background-size: 180px 180px;
     mix-blend-mode: overlay;
   }
 
-  h1, h2, h3 {
-    font-family: var(--font-display);
-    line-height: 1.2;
-    letter-spacing: 0.01em;
+  /* ── CAPA 2: Manchas de celuloide envejecido ──
+     Puntos oscuros aleatorios tipo "scratches" de carrete antiguo */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 8999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='spots'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='2' seed='8'/%3E%3CfeThreshold stdDeviation='0' operator='over'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23spots)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 300px 300px;
+    mix-blend-mode: multiply;
   }
 
-  h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
-  h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
-  h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
+  /* ── Tipografía base — Slab Serif 1930s ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    font-weight: 400; /* Ultra ya es peso máximo */
+  }
+
+  h1 { font-size: clamp(2.4rem, 6vw, 5rem); }
+  h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+  h3 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-family: var(--font-heading); }
+  h4 { font-size: 1.1rem; font-family: var(--font-label); letter-spacing: 0.05em; text-transform: uppercase; }
 
   a {
-    color: var(--ink);
+    color: var(--white);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color 0.15s ease;
   }
+  a:hover { color: var(--accent-red); }
 
-  a:hover {
-    color: var(--accent);
-  }
-
-  /* Custom scrollbar in B&W */
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  /* ── Scrollbar estilo "máquina mecánica" ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
   ::-webkit-scrollbar-thumb {
-    background: #333333;
-    border: 1px solid #111111;
-    border-radius: 4px;
+    background: var(--gray-700);
+    border-left: 1px solid var(--gray-600);
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555555;
-  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   COMPONENT CLASSES (CARTOON VINTAGE RUBBER HOSE)
-   ═══════════════════════════════════════════════════════════ */
+/* ============================================================
+   COMPONENTES — Estética de Impresión Analógica 1930s
+   ============================================================ */
 
 @layer components {
-  /* ── Vignette section overlay ─────────────────────── */
+
+  /* ── VIÑETEADO: cine mudo, encuadre de fotograma ── */
   .vignette-overlay {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+    z-index: 1;
+    background:
+      radial-gradient(ellipse 80% 80% at 50% 50%,
+        transparent 40%,
+        rgba(0,0,0,0.55) 70%,
+        rgba(0,0,0,var(--vignette-power)) 100%);
   }
 
-  /* ── Cartoon Buttons ────────────────────────────────── */
+  /* Variante para secciones oscuras (viñeta fuerte) */
+  .vignette-hard {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 60% at 50% 50%,
+        transparent 20%,
+        rgba(0,0,0,0.7) 65%,
+        rgba(0,0,0,0.97) 100%);
+  }
+
+  /* ── Fondo trama rayada (hatching) — da "volumen" tipo ilustración ── */
+  .bg-hatching {
+    background-image:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 3px,
+        rgba(255,255,255,0.025) 3px,
+        rgba(255,255,255,0.025) 4px
+      );
+  }
+
+  /* ── Fondo papel viejo — para secciones de contraste claro ── */
+  .bg-paper {
+    background-color: var(--paper);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' seed='4'/%3E%3CfeColorMatrix type='saturate' values='0.1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23paper)' opacity='0.08'/%3E%3C/svg%3E");
+    color: var(--black);
+  }
+
+  /* ── BOTONES: aspecto de cartel impreso a mano ── */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
-    padding: 0.75rem 1.6rem;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.04em;
+    gap: 0.55rem;
+    padding: 0.7rem 1.5rem;
+    font-family: var(--font-label);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
-    border: 3px solid #000000;
-    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Esquinas mínimas — "dibujado", no "diseño sistema digital" */
+    border-radius: var(--radius-sm);
+    border: 2.5px solid var(--black);
+    /* Sombra dura desplazada tipo cómic — NO difusa */
+    box-shadow: 5px 5px 0 var(--black);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
     position: relative;
     user-select: none;
+    /* Texture interna de tinta */
+    background-image: none;
   }
 
   .btn:active {
-    transform: translate(2px, 2px) !important;
-    box-shadow: 1px 1px 0 #000000 !important;
+    transform: translate(3px, 3px) !important;
+    box-shadow: 2px 2px 0 var(--black) !important;
   }
 
+  /* Botón primario — solo en CTAs cruciales */
   .btn-primary {
-    background: var(--accent);
-    color: #ffffff;
-    border-color: #000000;
-    box-shadow: 4px 4px 0 #000000;
+    background-color: var(--accent-red);
+    color: var(--white);
+    border-color: var(--black);
+    box-shadow: 5px 5px 0 var(--black);
+    /* Texture de tinta roja sobre el botón */
+    background-image:
+      repeating-linear-gradient(
+        -55deg,
+        rgba(0,0,0,0.06) 0px,
+        rgba(0,0,0,0.06) 1px,
+        transparent 1px,
+        transparent 6px
+      );
   }
 
   .btn-primary:hover {
-    background: var(--accent-hover);
+    background-color: var(--accent-red-dark);
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 #000000;
+    box-shadow: 7px 7px 0 var(--black);
   }
 
+  /* Botón secundario — aspecto de sello */
   .btn-secondary {
-    background: var(--bg-surface);
-    color: var(--ink);
-    border-color: var(--line);
-    box-shadow: 4px 4px 0 #000000;
+    background-color: var(--gray-800);
+    color: var(--white);
+    border-color: var(--white);
+    box-shadow: 5px 5px 0 var(--gray-700);
   }
 
   .btn-secondary:hover {
-    background: var(--ink);
-    color: #000000;
-    border-color: #ffffff;
+    background-color: var(--white);
+    color: var(--black);
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 #000000;
+    box-shadow: 7px 7px 0 var(--gray-700);
   }
 
   .btn-ghost {
-    background: transparent;
-    color: var(--ink);
+    background-color: transparent;
+    color: var(--gray-300);
     border-color: transparent;
     box-shadow: none;
   }
-
   .btn-ghost:hover {
-    color: var(--accent);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+    border-color: var(--gray-700);
+    box-shadow: 3px 3px 0 var(--gray-700);
   }
 
-  /* ── Vintage Cartoon Cards ────────────────────────── */
+  /* ── TARJETAS: superficie de madera/cartón prensado ── */
   .card {
-    background: var(--bg-surface);
-    border: 3px solid var(--line);
-    border-radius: var(--radius-lg);
+    background-color: var(--gray-800);
+    /* Doble borde: borde externo delgado + borde interno de sombra */
+    border: 2.5px solid var(--gray-600);
+    border-radius: var(--radius-md);
     padding: 1.5rem;
-    box-shadow: 5px 5px 0 #000000;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    /* Sombra dura, NO difusa */
+    box-shadow:
+      4px 4px 0 var(--black),
+      0 0 0 1px var(--gray-700);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+    position: relative;
+    /* Grano interno sutil */
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='cardgrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23cardgrain)' opacity='0.04'/%3E%3C/svg%3E");
+    background-blend-mode: overlay;
   }
 
   .card:hover {
-    border-color: var(--line);
-    box-shadow: 8px 8px 0 #000000, 0 0 0 1px var(--line);
-    transform: translate(-3px, -3px);
+    transform: translate(-2px, -2px);
+    box-shadow:
+      6px 6px 0 var(--black),
+      0 0 0 1px var(--gray-600);
+    border-color: var(--gray-400);
   }
 
-  /* ── Ink border utilities ─────────────────────────── */
-  .ink-border {
-    border: 3px solid var(--line);
-    box-shadow: 5px 5px 0 #000000;
-  }
-
-  .ink-border-red {
-    border: 3px solid var(--accent);
-    box-shadow: 5px 5px 0 #000000;
-  }
-
-  /* ── Badges ────────────────────────────────────────── */
+  /* ── BADGE: sello de goma tipo imprenta ── */
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-label);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    border: 2px solid #000000;
+    border: 2px solid var(--black);
+    box-shadow: 2px 2px 0 var(--black);
   }
 
   .badge-popular {
-    background: var(--accent);
-    color: #ffffff;
-    box-shadow: 2px 2px 0 #000000;
+    background-color: var(--accent-red);
+    color: var(--white);
+    background-image:
+      repeating-linear-gradient(
+        -45deg,
+        rgba(0,0,0,0.1) 0px,
+        rgba(0,0,0,0.1) 1px,
+        transparent 1px,
+        transparent 5px
+      );
   }
 
   .badge-active {
-    background: #ffffff;
-    color: #000000;
-    box-shadow: 2px 2px 0 #000000;
+    background-color: var(--gray-100);
+    color: var(--black);
+    border-color: var(--gray-700);
   }
 
   .badge-inactive {
-    background: #333333;
-    color: var(--ink-muted);
-    border-color: #555555;
+    background-color: var(--gray-700);
+    color: var(--gray-300);
+    border-color: var(--gray-600);
   }
 
-  /* ── Vintage Section Divider ──────────────────────── */
+  /* ── SEPARADOR: línea de tinta con ornamento ── */
   .divider-ornament {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    color: var(--ink-muted);
-    font-size: 1.2rem;
+    gap: 0.8rem;
+    color: var(--gray-500);
+    font-family: var(--font-label);
+    font-size: 1rem;
+    letter-spacing: 0.15em;
   }
 
   .divider-ornament::before,
   .divider-ornament::after {
     content: '';
     flex: 1;
-    height: 2px;
-    background: #2a2a2a;
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, var(--gray-600), transparent);
   }
 
-  /* ── Page Layout ──────────────────────────────────── */
+  /* ── CONTENEDOR ── */
   .page-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
 
-  /* ── Form Inputs ──────────────────────────────────── */
+  /* ── INPUTS: aspecto de formulario de época ── */
   .input {
     width: 100%;
-    background: #141414;
-    border: 2px solid var(--line);
+    background-color: var(--gray-900);
+    /* Borde de tinta visible */
+    border: 2px solid var(--gray-600);
     border-radius: var(--radius-sm);
-    color: var(--ink);
-    padding: 0.75rem 1rem;
+    color: var(--white);
+    padding: 0.7rem 0.9rem;
     font-family: var(--font-body);
     font-size: 0.95rem;
-    transition: all 0.2s ease;
+    line-height: 1.5;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
     outline: none;
-    box-shadow: 3px 3px 0 #000000;
+    box-shadow: 3px 3px 0 var(--black);
   }
 
   .input:focus {
-    border-color: var(--line);
-    box-shadow: 5px 5px 0 #000000;
-    background: #1a1a1a;
+    border-color: var(--gray-300);
+    box-shadow: 4px 4px 0 var(--black);
+    background-color: var(--gray-800);
   }
 
   .input::placeholder {
-    color: var(--ink-muted);
+    color: var(--gray-500);
+    font-style: italic;
   }
 
-  /* ── Star rating (B&W Ink style) ──────────────────── */
+  /* ── ESTRELLAS: asteriscos de tinta ── */
   .stars {
     display: inline-flex;
-    gap: 2px;
-    color: var(--ink);
+    gap: 3px;
+    color: var(--gray-100);
+    font-size: 1.1em;
   }
 
-  /* ── Slot buttons ─────────────────────────────────── */
+  /* ── SLOT BOTONES: celdas de calendario tipo taquilla ── */
   .slot-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.45rem 0.85rem;
     border-radius: var(--radius-sm);
-    border: 2px solid var(--line);
-    background: var(--bg-surface);
-    color: var(--ink);
-    font-size: 0.85rem;
-    font-weight: 700;
+    border: 2px solid var(--gray-600);
+    background-color: var(--gray-800);
+    color: var(--gray-300);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-    font-family: var(--font-body);
-    box-shadow: 3px 3px 0 #000000;
+    transition: all 0.12s ease;
+    font-family: var(--font-label);
+    box-shadow: 2px 2px 0 var(--black);
   }
 
   .slot-btn:hover {
-    background: var(--ink);
-    color: #000000;
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 #000000;
+    background-color: var(--gray-700);
+    color: var(--white);
+    border-color: var(--gray-400);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--black);
   }
 
   .slot-btn.selected {
-    background: var(--accent);
-    border-color: #000000;
-    color: #ffffff;
-    box-shadow: 3px 3px 0 #000000;
+    background-color: var(--accent-red);
+    border-color: var(--black);
+    color: var(--white);
+    box-shadow: 3px 3px 0 var(--black);
+    background-image:
+      repeating-linear-gradient(
+        -45deg,
+        rgba(0,0,0,0.08) 0px,
+        rgba(0,0,0,0.08) 1px,
+        transparent 1px,
+        transparent 5px
+      );
   }
 
   .slot-btn:disabled {
-    opacity: 0.3;
+    opacity: 0.25;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
 
-  /* ── Wizard Step Indicator ────────────────────────── */
+  /* ── WIZARD STEPS ── */
   .step-indicator {
     display: flex;
     align-items: center;
@@ -348,74 +478,170 @@
   }
 
   .step-dot {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 900;
-    font-size: 0.9rem;
-    border: 3px solid var(--line);
-    background: var(--bg-surface);
-    color: var(--ink-muted);
-    transition: all 0.3s ease;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 2.5px solid var(--gray-600);
+    background-color: var(--gray-800);
+    color: var(--gray-500);
+    transition: all 0.25s ease;
     position: relative;
     z-index: 1;
-    box-shadow: 3px 3px 0 #000000;
+    box-shadow: 2px 2px 0 var(--black);
   }
 
   .step-dot.active {
-    border-color: #000000;
-    background: var(--accent);
-    color: #ffffff;
-    box-shadow: 4px 4px 0 #000000;
+    border-color: var(--black);
+    background-color: var(--accent-red);
+    color: var(--white);
+    box-shadow: 3px 3px 0 var(--black);
   }
 
   .step-dot.done {
-    border-color: var(--line);
-    background: var(--ink);
-    color: #000000;
+    border-color: var(--gray-400);
+    background-color: var(--gray-100);
+    color: var(--black);
   }
 
   .step-line {
     flex: 1;
-    height: 3px;
-    background: #333333;
-    transition: background 0.3s ease;
+    height: 2.5px;
+    background-color: var(--gray-700);
+    transition: background-color 0.25s ease;
   }
 
   .step-line.done {
-    background: var(--line);
+    background-color: var(--gray-400);
+  }
+
+  /* ── BORDES DE TINTA (utilidades de contorno) ── */
+  .ink-border {
+    border: 2.5px solid var(--white);
+    box-shadow: 4px 4px 0 var(--black), -1px -1px 0 var(--gray-700);
+  }
+
+  .ink-border-red {
+    border: 2.5px solid var(--accent-red);
+    box-shadow: 4px 4px 0 var(--black);
+  }
+
+  /* ── TÍTULO CON CONTORNO DE TINTA (efecto texto sello) ── */
+  .text-ink-outline {
+    /* Contorno de tinta orgánico — 8 direcciones para efecto grueso */
+    text-shadow:
+      2px  2px  0 var(--black),
+      -2px  2px  0 var(--black),
+       2px -2px  0 var(--black),
+      -2px -2px  0 var(--black),
+       2px  0   0 var(--black),
+      -2px  0   0 var(--black),
+       0   2px  0 var(--black),
+       0  -2px  0 var(--black);
+  }
+
+  /* ── TEXTO IMPRESO (aspecto de máquina de escribir) ── */
+  .text-typewriter {
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SECCIÓN CON BORDE SUPERIOR DE TINTA (como paneles de cómic) ── */
+  .panel-border-top {
+    border-top: 3px solid var(--gray-600);
+  }
+
+  .panel-border {
+    border: 3px solid var(--gray-600);
+    box-shadow: inset 0 0 0 1px var(--gray-700);
+  }
+
+  /* ── "SCRATCHES" líneas de película horizontales ── */
+  .film-scratch::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right,
+      transparent 0%, rgba(255,255,255,0.08) 20%,
+      transparent 30%, transparent 70%,
+      rgba(255,255,255,0.04) 85%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ── NAVBAR: fondo tinta con textura de prensa ── */
+  .navbar-bg {
+    background-color: rgba(10, 10, 10, 0.97);
+    backdrop-filter: blur(8px);
+    /* Línea de tinta inferior doble */
+    border-bottom: 2px solid var(--gray-700);
+    box-shadow: 0 2px 0 var(--gray-800);
+  }
+
+  /* ── Indicador de sección activa en nav ── */
+  .nav-active {
+    color: var(--white);
+    border-bottom: 2px solid var(--accent-red);
+    padding-bottom: 2px;
+  }
+
+  /* ── CARD IMAGEN: aspecto de fotograma de película ── */
+  .film-frame {
+    position: relative;
+    border: 3px solid var(--gray-700);
+    box-shadow:
+      inset 2px 2px 0 var(--gray-800),
+      4px 4px 0 var(--black);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+  }
+
+  .film-frame img {
+    /* Imágenes en B&W con alto contraste como en celuloide */
+    filter: grayscale(100%) contrast(1.15) brightness(0.9);
+    transition: filter 0.3s ease;
+  }
+
+  .film-frame:hover img {
+    filter: grayscale(100%) contrast(1.25) brightness(0.95);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   ANIMATIONS (RUBBER HOSE CARTOON)
-   ═══════════════════════════════════════════════════════════ */
+/* ============================================================
+   ANIMACIONES — Rubber Hose 1930s (elástico, no digital)
+   ============================================================ */
 
 @layer utilities {
-  /* Squash & stretch rubber hose cartoon animation */
+
+  /* Squash & Stretch orgánico */
   @keyframes squash {
     0%   { transform: scale(1, 1); }
-    30%  { transform: scale(1.1, 0.9); }
-    60%  { transform: scale(0.94, 1.06); }
+    20%  { transform: scale(1.12, 0.88); }
+    50%  { transform: scale(0.92, 1.08); }
+    80%  { transform: scale(1.04, 0.97); }
     100% { transform: scale(1, 1); }
   }
 
   .animate-squash {
-    animation: squash 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: squash 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
   }
 
+  /* Entrada suave desde abajo */
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .animate-fadeInUp {
-    animation: fadeInUp 0.4s ease forwards;
+    animation: fadeInUp 0.45s ease forwards;
   }
 
+  /* Fade simple */
   @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -425,6 +651,7 @@
     animation: fadeIn 0.3s ease forwards;
   }
 
+  /* Spin simple */
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -433,9 +660,63 @@
     animation: spin 0.8s linear infinite;
   }
 
-  /* Text cartoon outline helper */
-  .text-cartoon-shadow {
-    text-shadow: 3px 3px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  /* Parpadeo celuloide — MUY SUTIL, accesible (< 3 destellos/s) */
+  @keyframes filmFlicker {
+    0%   { opacity: 1; }
+    92%  { opacity: 1; }
+    93%  { opacity: 0.92; }
+    94%  { opacity: 1; }
+    96%  { opacity: 0.95; }
+    100% { opacity: 1; }
   }
-}
 
+  .animate-flicker {
+    animation: filmFlicker 8s ease infinite;
+  }
+
+  /* Skeleton loading en estilo "trama" */
+  @keyframes hatchScan {
+    0%   { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+  }
+
+  .skeleton {
+    background-color: var(--gray-800);
+    background-image:
+      repeating-linear-gradient(
+        -45deg,
+        var(--gray-800) 0,
+        var(--gray-800) 4px,
+        var(--gray-700) 4px,
+        var(--gray-700) 8px
+      );
+    background-size: 40px 40px;
+    animation: hatchScan 0.6s linear infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Sombra texto (contorno de tinta 1930s para títulos grandes) */
+  .text-cartoon-shadow {
+    text-shadow:
+      3px  3px 0 var(--black),
+      -1px  3px 0 var(--black),
+       3px -1px 0 var(--black),
+      -1px -1px 0 var(--black),
+       1px  3px 0 var(--black),
+       3px  1px 0 var(--black);
+  }
+
+  /* Utilidad helper para grises intermedios */
+  .text-gray-900 { color: var(--gray-900); }
+  .text-gray-700 { color: var(--gray-700); }
+  .text-gray-500 { color: var(--gray-500); }
+  .text-gray-400 { color: var(--gray-400); }
+  .text-gray-300 { color: var(--gray-300); }
+  .text-gray-100 { color: var(--gray-100); }
+  .text-paper    { color: var(--paper); }
+  .text-accent   { color: var(--accent-red); }
+
+  .bg-gray-800   { background-color: var(--gray-800); }
+  .bg-gray-700   { background-color: var(--gray-700); }
+  .bg-gray-900   { background-color: var(--gray-900); }
+}

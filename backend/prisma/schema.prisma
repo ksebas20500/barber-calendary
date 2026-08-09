@@ -2,7 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // binaryTargets explícitos: "native" para desarrollo local (macOS/Linux x64)
+  // y "linux-musl-openssl-3.0.x" para Alpine (Render, Docker)
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

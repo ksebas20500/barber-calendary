@@ -1,7 +1,22 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { Scissors, Menu, X, User, LogOut, Settings } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings } from 'lucide-react'
+
+// Tijeras de tinta custom (trazo variable) — NO ícono genérico de librería
+const ScissorsInkSVG = () => (
+  <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <path d="M8 5 C9 4.2, 11 4.8, 12 6.5 L18.5 17.5"
+      stroke="white" strokeWidth="3.2" strokeLinecap="round" fill="none" />
+    <path d="M24 5 C23 4.2, 21 4.8, 20 6.5 L13.5 17.5"
+      stroke="white" strokeWidth="3.2" strokeLinecap="round" fill="none" />
+    <circle cx="16" cy="16.8" r="2.5" stroke="white" strokeWidth="2.5" fill="none" />
+    <ellipse cx="10" cy="25" rx="4.5" ry="4" stroke="white" strokeWidth="2.5" fill="none" />
+    <ellipse cx="22" cy="25" rx="4.5" ry="4" stroke="white" strokeWidth="2.5" fill="none" />
+    <line x1="12.8" y1="18.8" x2="9.5" y2="21.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="19.2" y1="18.8" x2="22.5" y2="21.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+)
 
 export default function Navbar() {
   const { user, loginWithGoogle, logout, isAdmin, isBarbero } = useAuth()
@@ -20,45 +35,79 @@ export default function Navbar() {
   }
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `text-xs md:text-sm font-extrabold uppercase tracking-widest transition-all duration-150 py-1 ${
+    `transition-all duration-150 py-1 ${
       isActive
-        ? 'text-[var(--accent)] border-b-2 border-[var(--accent)]'
-        : 'text-[var(--ink-muted)] hover:text-white'
+        ? 'nav-active'
+        : 'hover:text-white'
     }`
+
+  const navLinkStyle = {
+    fontFamily: 'var(--font-label)',
+    fontSize: '0.78rem',
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase' as const,
+    fontWeight: 600,
+    color: 'var(--gray-400)',
+  }
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b-2 border-[#262626]"
-      style={{ background: 'rgba(10, 10, 10, 0.95)', backdropFilter: 'blur(12px)' }}
+      className="navbar-bg sticky top-0 z-50"
     >
       <div className="page-container">
         <div className="flex items-center justify-between h-20">
-          {/* Logo vintage cartoon B&W */}
+          {/* Logo: marco de tinta, tijeras custom, tipografía Ultra */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center border-3 border-white bg-black shadow-[3px_3px_0px_#000000] group-hover:scale-105 transition-transform">
-              <Scissors size={22} className="text-white stroke-[2.5]" />
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                border: '2.5px solid var(--gray-600)',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--black)',
+                boxShadow: '3px 3px 0 var(--black)',
+                transition: 'transform 0.15s ease',
+              }}
+              className="group-hover:scale-105"
+            >
+              <ScissorsInkSVG />
             </div>
             <div>
               <span
-                className="block text-xl leading-none font-black tracking-wider text-white"
-                style={{ fontFamily: 'var(--font-title)' }}
+                className="block leading-none text-white"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.25rem',
+                  letterSpacing: '0.06em',
+                }}
               >
                 BARBERÍA
               </span>
               <span
-                className="block text-xs leading-tight tracking-[0.25em] font-extrabold uppercase text-[var(--ink-muted)]"
+                style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-label)',
+                  fontSize: '0.62rem',
+                  letterSpacing: '0.3em',
+                  textTransform: 'uppercase',
+                  color: 'var(--gray-500)',
+                  lineHeight: 1.4,
+                }}
               >
-                DENVER 1930
+                DENVER ✦ 1930
               </span>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav — Special Elite font, trazo fino */}
           <div className="hidden md:flex items-center gap-8">
-            <NavLink to="/servicios" className={navLinkClass}>Servicios</NavLink>
-            <NavLink to="/reservar" className={navLinkClass}>Reservar</NavLink>
+            <NavLink to="/servicios" className={navLinkClass} style={navLinkStyle}>Servicios</NavLink>
+            <NavLink to="/reservar" className={navLinkClass} style={navLinkStyle}>Reservar</NavLink>
             {isBarbero && (
-              <NavLink to="/admin" className={navLinkClass}>Admin</NavLink>
+              <NavLink to="/admin" className={navLinkClass} style={navLinkStyle}>Admin</NavLink>
             )}
           </div>
 
@@ -123,10 +172,10 @@ export default function Navbar() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden border-t-2 border-[#262626] py-5 flex flex-col gap-4 animate-fadeIn">
-            <NavLink to="/servicios" className={navLinkClass} onClick={() => setMenuOpen(false)}>Servicios</NavLink>
-            <NavLink to="/reservar" className={navLinkClass} onClick={() => setMenuOpen(false)}>Reservar</NavLink>
+            <NavLink to="/servicios" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Servicios</NavLink>
+            <NavLink to="/reservar" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Reservar</NavLink>
             {isBarbero && (
-              <NavLink to="/admin" className={navLinkClass} onClick={() => setMenuOpen(false)}>Admin</NavLink>
+              <NavLink to="/admin" className={navLinkClass} style={navLinkStyle} onClick={() => setMenuOpen(false)}>Admin</NavLink>
             )}
             {user ? (
               <div className="flex items-center justify-between pt-3 border-t border-[#262626]">
