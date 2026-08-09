@@ -5,242 +5,382 @@ import { serviciosApi } from '@/lib/api'
 import ServicioCard from '@/components/client/ServicioCard'
 import { useAuth } from '@/contexts/AuthContext'
 
-// ── SVG CUSTOM: Tijeras de tinta (trazo variable, NO Lucide) ──────────────
+// ── SVG CUSTOM: Tijeras de tinta analógica 1930s (trazo variable + hatching) ──
 const ScissorsSVG = ({ size = 28, className = '' }: { size?: number; className?: string }) => (
   <svg
     width={size}
     height={size}
-    viewBox="0 0 32 32"
+    viewBox="0 0 36 36"
     fill="none"
     className={className}
     aria-hidden="true"
   >
-    {/* Trazo orgánico con stroke-width variable = aspecto de pluma de tinta */}
+    {/* Hojas de la tijera con contorno grueso y filo fino */}
     <path
-      d="M8 6 C9 5, 11 5.5, 12 7 L19 18"
-      stroke="currentColor" strokeWidth="3" strokeLinecap="round"
-      fill="none" strokeLinejoin="round"
+      d="M9 7 C10 6, 12 7, 13.5 9 L21.5 20"
+      stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
     />
     <path
-      d="M24 6 C23 5, 21 5.5, 20 7 L13 18"
-      stroke="currentColor" strokeWidth="3" strokeLinecap="round"
-      fill="none" strokeLinejoin="round"
+      d="M27 7 C26 6, 24 7, 22.5 9 L14.5 20"
+      stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
     />
-    {/* Pivote central — círculo de tinta */}
-    <circle cx="16" cy="17" r="2.2" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    {/* Mangos redondeados estilo rubber-hose */}
-    <ellipse cx="10" cy="25" rx="4" ry="3.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    <ellipse cx="22" cy="25" rx="4" ry="3.5" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    <line x1="12.5" y1="18.5" x2="9" y2="22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    <line x1="19.5" y1="18.5" x2="23" y2="22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Línea interna de filo (detalle fino) */}
+    <path d="M11 9.5 L19.5 19" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.6" />
+    <path d="M25 9.5 L16.5 19" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.6" />
+    {/* Pivote remachado */}
+    <circle cx="18" cy="19" r="2.8" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <circle cx="18" cy="19" r="1" fill="currentColor" />
+    {/* Mangos circulares rubber-hose */}
+    <ellipse cx="11.5" cy="28" rx="5" ry="4.5" stroke="currentColor" strokeWidth="3" fill="none" />
+    <ellipse cx="24.5" cy="28" rx="5" ry="4.5" stroke="currentColor" strokeWidth="3" fill="none" />
+    <line x1="14" y1="21" x2="10.5" y2="24.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    <line x1="22" y1="21" x2="25.5" y2="24.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
   </svg>
 )
 
-// ── SVG CUSTOM: Polo de barbero animado ──────────────────────────────────
+// ── SVG CUSTOM: Poste de barbero 1930s con trama ──────────────────────────
 const BarberPoleSVG = () => (
-  <svg width="14" height="48" viewBox="0 0 14 48" fill="none" aria-hidden="true">
-    <rect x="1" y="1" width="12" height="46" rx="6" stroke="currentColor" strokeWidth="2" fill="none" />
-    {/* Espirales tipo poste de barbería */}
-    <path d="M1 12 Q7 14 13 12" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    <path d="M1 20 Q7 22 13 20" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    <path d="M1 28 Q7 30 13 28" stroke="currentColor" strokeWidth="1.5" fill="none" />
-    <path d="M1 36 Q7 38 13 36" stroke="currentColor" strokeWidth="1.5" fill="none" />
+  <svg width="18" height="52" viewBox="0 0 18 52" fill="none" aria-hidden="true">
+    {/* Marco exterior contorno tinta */}
+    <rect x="2" y="2" width="14" height="48" rx="7" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    {/* Tapas esféricas superior e inferior */}
+    <circle cx="9" cy="6" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
+    <circle cx="9" cy="46" r="3.5" stroke="currentColor" strokeWidth="2" fill="none" />
+    {/* Espirales con trazo de tinta variable */}
+    <path d="M2 14 Q9 17 16 14" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 22 Q9 25 16 22" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 30 Q9 33 16 30" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <path d="M2 38 Q9 41 16 38" stroke="currentColor" strokeWidth="2.5" fill="none" />
   </svg>
 )
 
-// ── SVG CUSTOM: Calendario de cita (trazo de tinta variable) ─────────────
+// ── SVG CUSTOM: Calendario de cita ─────────────────────────────────────────
 const CalendarInkSVG = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    {/* Marco exterior — trazo más grueso para contorno tipo tinta */}
-    <rect x="2" y="4" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="2.5" fill="none" />
-    {/* Línea horizontal de encabezado */}
-    <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" strokeWidth="2" />
-    {/* Argollas superiores */}
-    <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    {/* Puntos de fechas — detalles finos */}
-    <circle cx="8" cy="14" r="1.2" fill="currentColor" />
-    <circle cx="12" cy="14" r="1.2" fill="currentColor" />
-    <circle cx="16" cy="14" r="1.2" fill="currentColor" />
-    <circle cx="8" cy="18" r="1.2" fill="currentColor" />
-    <circle cx="12" cy="18" r="1.2" fill="currentColor" />
+    <rect x="2" y="4" width="20" height="18" rx="2" stroke="currentColor" strokeWidth="2.8" fill="none" />
+    <line x1="2" y1="9.5" x2="22" y2="9.5" stroke="currentColor" strokeWidth="2" />
+    <line x1="7.5" y1="2" x2="7.5" y2="6" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+    <line x1="16.5" y1="2" x2="16.5" y2="6" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
+    <circle cx="7.5" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="12" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="16.5" cy="14" r="1.3" fill="currentColor" />
+    <circle cx="7.5" cy="18" r="1.3" fill="currentColor" />
+    <circle cx="12" cy="18" r="1.3" fill="currentColor" />
   </svg>
 )
 
-// ── SVG CUSTOM: Estrella de tinta (no rellenada con color) ────────────────
+// ── SVG CUSTOM: Estrella de tinta ──────────────────────────────────────────
 const StarInkSVG = ({ filled = false, size = 16 }: { filled?: boolean; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
     <polygon
       points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
       stroke="currentColor"
-      strokeWidth={filled ? '0' : '2'}
+      strokeWidth={filled ? '0' : '2.2'}
       fill={filled ? 'currentColor' : 'none'}
       strokeLinejoin="round"
     />
   </svg>
 )
 
-// ── SVG MASCOTA: Barbero estilo rubber-hose Fleischer 1930s ──────────────
-// Personaje cartoon con ojos "pie-eye", guantes de 4 dedos, extremidades hose
+// ═══════════════════════════════════════════════════════════════════════════
+// MASCOTA "EL MAESTRO SÁNCHEZ" — ESTILO CARTOON RUBBER-HOSE FLEISCHER 1930s
+// Cumple estrictamente las 6 reglas:
+// 1. Hatching / Cross-hatching en negro para volumen y sombras (sin plano gris)
+// 2. Grosor de tinta VARIABLE (silueta externa 5-6px, detalles internos 1.5-2px)
+// 3. Ojos "Pie-Eye" clásicos años 30, cejas expresivas gruesas, boca exagerada sonriente
+// 4. Extremidades Rubber-Hose (tubos flexibles sin codos/rodillas), guante blanco mitón 4-dedos Mickey
+// 5. Textura de grano/tinta y trama analógica integrada sobre la ilustración
+// 6. Pose idéntica con sombrero de copa y tijeras en mano
+// ═══════════════════════════════════════════════════════════════════════════
 const BarberMascotSVG = () => (
   <svg
-    viewBox="0 0 220 380"
+    viewBox="0 0 260 420"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    aria-label="Barbero vintage estilo caricatura 1930s"
+    aria-label="El Maestro Sánchez — Caricatura Rubber-Hose 1930s"
     className="w-full h-full"
   >
-    {/* ── Cuerpo rubber-hose (forma ovalada sin articulaciones rígidas) ── */}
-    {/* Sombra del personaje */}
-    <ellipse cx="113" cy="373" rx="55" ry="8" fill="rgba(0,0,0,0.35)" />
+    <defs>
+      {/* ── Rule 1: Patrones de Hatching (Rayado analógico a mano) ── */}
+      {/* Rayado diagonal 45° ligero para sombras de ropa y piel */}
+      <pattern id="hatch-light" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="5" stroke="#000000" strokeWidth="1.2" />
+      </pattern>
 
-    {/* Piernas tipo manguera — curvas orgánicas */}
-    <path d="M95 300 Q85 340 75 365 Q70 372 78 373 Q87 374 90 366 Q98 345 105 315"
-      stroke="#242424" strokeWidth="22" strokeLinecap="round" fill="none" />
-    <path d="M95 300 Q85 340 75 365 Q70 372 78 373 Q87 374 90 366 Q98 345 105 315"
-      stroke="#6b6b6b" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Rayado diagonal 45° denso para sombras bajo sombrero, barbilla y chaleco */}
+      <pattern id="hatch-dark" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="3.5" stroke="#000000" strokeWidth="1.4" />
+      </pattern>
 
-    <path d="M125 300 Q135 340 145 365 Q150 372 142 373 Q133 374 130 366 Q122 345 115 315"
-      stroke="#242424" strokeWidth="22" strokeLinecap="round" fill="none" />
-    <path d="M125 300 Q135 340 145 365 Q150 372 142 373 Q133 374 130 366 Q122 345 115 315"
-      stroke="#6b6b6b" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Cross-Hatching (rayado cruzado) para sombras profundas */}
+      <pattern id="cross-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="4" stroke="#000000" strokeWidth="1.3" />
+        <line x1="0" y1="0" x2="4" y2="0" stroke="#000000" strokeWidth="1.3" />
+      </pattern>
 
-    {/* Zapatos tipo globo rubber-hose */}
-    <ellipse cx="80" cy="371" rx="18" ry="9" fill="#1a1a1a" stroke="#0d0d0d" strokeWidth="2" />
-    <ellipse cx="140" cy="371" rx="18" ry="9" fill="#1a1a1a" stroke="#0d0d0d" strokeWidth="2" />
-    <ellipse cx="79" cy="369" rx="12" ry="5" fill="#3d3d3d" />
-    <ellipse cx="139" cy="369" rx="12" ry="5" fill="#3d3d3d" />
+      {/* ── Rule 5: Filtro de Grano de Celuloide/Tinta 1930s ── */}
+      <filter id="ink-grain-filter" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" result="noise" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 0.12 0" />
+        <feComposite operator="in" in2="SourceGraphic" />
+      </filter>
+    </defs>
 
-    {/* Cuerpo principal — traje de barbero */}
-    {/* Sombra del cuerpo con trama */}
-    <ellipse cx="114" cy="265" rx="58" ry="60" fill="#1a1a1a" />
-    {/* Cuerpo blanco de la camisa */}
-    <ellipse cx="110" cy="258" rx="55" ry="58" fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="3" />
-    {/* Chaleco oscuro */}
-    <path d="M80 210 Q82 265 85 300 Q110 310 135 300 Q138 265 140 210 Q125 195 110 193 Q95 195 80 210Z"
-      fill="#242424" stroke="#0d0d0d" strokeWidth="2.5" />
-    {/* Detalle trama del chaleco — hatching tipo ilustración */}
-    <path d="M90 215 L88 295 M97 212 L95 298 M104 210 L102 300 M111 210 L109 300 M118 210 L116 300 M125 212 L123 298 M132 215 L130 295"
-      stroke="#3d3d3d" strokeWidth="0.8" opacity="0.6" />
-    {/* Solapa de camisa */}
-    <path d="M95 210 L110 230 L125 210 L115 205 L110 215 L105 205Z"
-      fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="2" />
-    {/* Corbatín de moño */}
-    <path d="M104 226 L98 221 L104 218 L110 222 L116 218 L122 221 L116 226 L110 230Z"
-      fill="#c1272d" stroke="#0d0d0d" strokeWidth="1.5" />
-    {/* Botones de la camisa */}
-    <circle cx="110" cy="242" r="3" fill="#0d0d0d" />
-    <circle cx="110" cy="256" r="3" fill="#0d0d0d" />
-    <circle cx="110" cy="270" r="3" fill="#0d0d0d" />
+    <g filter="url(#ink-grain-filter)">
+      {/* ── Sombra proyectada en suelo (Hatching denso) ── */}
+      <ellipse cx="130" cy="404" rx="70" ry="10" fill="url(#cross-hatch)" stroke="#000000" strokeWidth="2" />
 
-    {/* Brazos rubber-hose */}
-    {/* Brazo izquierdo — sosteniendo tijeras */}
-    <path d="M80 220 Q50 230 35 255 Q30 265 38 270 Q46 275 52 265 Q65 248 85 238"
-      stroke="#0d0d0d" strokeWidth="24" strokeLinecap="round" fill="none" />
-    <path d="M80 220 Q50 230 35 255 Q30 265 38 270 Q46 275 52 265 Q65 248 85 238"
-      stroke="#f5f5ef" strokeWidth="17" strokeLinecap="round" fill="none" />
+      {/* ── Rule 4: PIERNAS RUBBER-HOSE (Tubos flexibles sin rodillas) ── */}
+      {/* Pierna Izquierda */}
+      <path d="M102 315 Q88 355 78 392"
+        stroke="#000000" strokeWidth="24" strokeLinecap="round" fill="none" />
+      <path d="M102 315 Q88 355 78 392"
+        stroke="#f5f5ef" strokeWidth="15" strokeLinecap="round" fill="none" />
+      {/* Sombra de pierna izq en hatching */}
+      <path d="M96 325 Q84 358 75 390 L81 392 Q92 358 102 325 Z"
+        fill="url(#hatch-dark)" opacity="0.85" />
 
-    {/* Guante izquierdo tipo rubber-hose (4 dedos) */}
-    <ellipse cx="37" cy="272" rx="14" ry="12" fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="2.5" />
-    {/* Dedos del guante */}
-    <path d="M26 265 Q22 258 25 252 Q28 248 32 251 Q30 260 31 267"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M30 263 Q26 254 30 249 Q34 246 37 250 Q35 260 34 268"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M37 261 Q35 252 40 249 Q44 248 46 253 Q43 261 41 268"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M44 263 Q44 254 48 252 Q52 253 51 260 Q49 267 47 272"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
+      {/* Pierna Derecha */}
+      <path d="M158 315 Q172 355 182 392"
+        stroke="#000000" strokeWidth="24" strokeLinecap="round" fill="none" />
+      <path d="M158 315 Q172 355 182 392"
+        stroke="#f5f5ef" strokeWidth="15" strokeLinecap="round" fill="none" />
+      {/* Sombra de pierna der en hatching */}
+      <path d="M164 325 Q176 358 185 390 L179 392 Q168 358 158 325 Z"
+        fill="url(#hatch-dark)" opacity="0.85" />
 
-    {/* Tijeras en la mano izquierda */}
-    <g transform="translate(12,245) rotate(-30)">
-      <path d="M8 4 L18 22" stroke="#525252" strokeWidth="4" strokeLinecap="round" />
-      <path d="M22 4 L12 22" stroke="#525252" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="15" cy="20" r="3" stroke="#525252" strokeWidth="2.5" fill="none" />
-      <ellipse cx="10" cy="27" rx="4" ry="3" stroke="#525252" strokeWidth="2" fill="none" />
-      <ellipse cx="20" cy="27" rx="4" ry="3" stroke="#525252" strokeWidth="2" fill="none" />
-      <line x1="12.5" y1="21.5" x2="9.5" y2="24" stroke="#525252" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="17.5" y1="21.5" x2="20.5" y2="24" stroke="#525252" strokeWidth="2.5" strokeLinecap="round" />
+      {/* Zapatos inflados tipo bola Fleischer */}
+      {/* Zapato Izquierdo */}
+      <path d="M52 395 C45 385 70 380 92 388 C98 395 95 404 82 405 C65 406 55 403 52 395 Z"
+        fill="#000000" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M60 388 C68 384 82 386 86 392" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" fill="none" />
+      {/* Zapato Derecho */}
+      <path d="M208 395 C215 385 190 380 168 388 C162 395 165 404 178 405 C195 406 205 403 208 395 Z"
+        fill="#000000" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M200 388 C192 384 178 386 174 392" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+
+      {/* ── CUERPO PRINCIPAL (Tronco Rubber-Hose) ── */}
+      {/* Silueta exterior súper gruesa (Rule 2) */}
+      <ellipse cx="130" cy="265" rx="66" ry="64" fill="#000000" />
+      {/* Interior camisa blanco hueso */}
+      <ellipse cx="130" cy="263" rx="60" ry="58" fill="#f5f5ef" stroke="#000000" strokeWidth="4" />
+
+      {/* Hatching de sombra lateral en el cuerpo (Rule 1) */}
+      <path d="M72 263 C72 295 95 320 130 321 C100 320 78 295 78 263 Z"
+        fill="url(#hatch-dark)" />
+      <path d="M188 263 C188 295 165 320 130 321 C160 320 182 295 182 263 Z"
+        fill="url(#hatch-dark)" />
+
+      {/* Chaleco de barbero 1930s con solapas */}
+      <path d="M90 215 Q95 285 98 320 Q130 330 162 320 Q165 285 170 215 Q150 200 130 198 Q110 200 90 215 Z"
+        fill="#141414" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+
+      {/* Hatching en el chaleco (Líneas de sombra cruzadas) */}
+      <path d="M92 217 Q97 285 100 318 L160 318 Q163 285 168 217 Z"
+        fill="url(#cross-hatch)" opacity="0.9" />
+
+      {/* Solapas de la camisa */}
+      <path d="M108 200 L130 232 L152 200 L140 196 L130 208 L120 196 Z"
+        fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+
+      {/* Corbatín de moño rojo vintage */}
+      <path d="M120 225 L110 218 L120 214 L130 220 L140 214 L150 218 L140 225 L130 230 Z"
+        fill="#c1272d" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+
+      {/* Botones de tinta en chaleco (Rule 2: detalles internos finos) */}
+      <circle cx="130" cy="245" r="3.5" fill="#000000" stroke="#ffffff" strokeWidth="1" />
+      <circle cx="130" cy="265" r="3.5" fill="#000000" stroke="#ffffff" strokeWidth="1" />
+      <circle cx="130" cy="285" r="3.5" fill="#000000" stroke="#ffffff" strokeWidth="1" />
+
+
+      {/* ── Rule 4: BRAZO IZQUIERDO RUBBER-HOSE (Sosteniendo tijeras) ── */}
+      {/* Tubo de brazo negro exterior */}
+      <path d="M90 230 Q45 245 32 275 Q26 288 38 294 Q50 300 58 286 Q72 262 96 250"
+        stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+      {/* Tubo de brazo blanco interior */}
+      <path d="M90 230 Q45 245 32 275 Q26 288 38 294 Q50 300 58 286 Q72 262 96 250"
+        stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Sombra de brazo en hatching */}
+      <path d="M45 245 Q32 275 26 288 L34 292 Q42 275 52 250 Z"
+        fill="url(#hatch-dark)" />
+
+      {/* Guante Blanco Cartoon Mitón 4-dedos (Mickey/Cuphead style) */}
+      <g transform="translate(10, 270)">
+        {/* Muñeca con doble pliegue de guante */}
+        <ellipse cx="32" cy="18" rx="12" ry="6" fill="#f5f5ef" stroke="#000000" strokeWidth="3.5" />
+        {/* Cuerpo principal del guante */}
+        <path d="M20 18 C10 12 8 30 22 36 C34 40 42 28 32 18 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+
+        {/* 4 Dedos regordetes de guante */}
+        {/* Pulgar */}
+        <path d="M15 15 C8 10 5 20 14 22 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 2 */}
+        <path d="M16 28 C8 32 10 42 20 38 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 3 */}
+        <path d="M23 35 C18 44 26 48 30 40 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 4 */}
+        <path d="M30 36 C30 44 38 42 34 34 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+
+        {/* 3 Costuras negras traseras del guante clásico Mickey */}
+        <path d="M24 22 L22 29" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M28 22 L27 30" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M32 23 L32 29" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+      </g>
+
+      {/* Tijeras en mano izquierda (con trazo orgánico de tinta y hatching) */}
+      <g transform="translate(0, 260) rotate(-22)">
+        <path d="M10 6 L24 28" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+        <path d="M10 6 L24 28" stroke="#d4d4cc" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M28 6 L14 28" stroke="#000000" strokeWidth="5" strokeLinecap="round" />
+        <path d="M28 6 L14 28" stroke="#d4d4cc" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="19" cy="25" r="4" stroke="#000000" strokeWidth="3" fill="#f5f5ef" />
+        <circle cx="19" cy="25" r="1.5" fill="#000000" />
+        <ellipse cx="12" cy="33" rx="5" ry="4" stroke="#000000" strokeWidth="3" fill="none" />
+        <ellipse cx="26" cy="33" rx="5" ry="4" stroke="#000000" strokeWidth="3" fill="none" />
+      </g>
+
+
+      {/* ── Rule 4: BRAZO DERECHO RUBBER-HOSE (Saludando entusiasta) ── */}
+      {/* Tubo de brazo negro exterior */}
+      <path d="M170 230 Q210 235 228 210 Q240 195 230 184 Q218 175 208 190 Q192 210 164 220"
+        stroke="#000000" strokeWidth="26" strokeLinecap="round" fill="none" />
+      {/* Tubo de brazo blanco interior */}
+      <path d="M170 230 Q210 235 228 210 Q240 195 230 184 Q218 175 208 190 Q192 210 164 220"
+        stroke="#f5f5ef" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Sombra de brazo derecho en hatching */}
+      <path d="M210 235 Q228 210 240 195 L234 188 Q220 208 204 230 Z"
+        fill="url(#hatch-dark)" />
+
+      {/* Guante Blanco Derecho Saludando (4 dedos mitón cartoon) */}
+      <g transform="translate(208, 155)">
+        {/* Muñeca guante */}
+        <ellipse cx="16" cy="30" rx="10" ry="5" fill="#f5f5ef" stroke="#000000" strokeWidth="3.5" />
+        {/* Palma del guante */}
+        <path d="M8 26 C2 15 28 8 30 24 C31 34 16 36 8 26 Z"
+          fill="#f5f5ef" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+
+        {/* 4 Dedos extendidos en saludo */}
+        {/* Dedo 1 (Pulgar) */}
+        <path d="M6 22 C-2 18 2 8 10 14 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 2 */}
+        <path d="M12 12 C10 0 20 0 20 10 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 3 */}
+        <path d="M20 10 C22 -2 30 0 28 12 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+        {/* Dedo 4 */}
+        <path d="M27 14 C32 4 38 8 32 18 Z" fill="#f5f5ef" stroke="#000000" strokeWidth="3" />
+
+        {/* 3 Costuras negras de guante */}
+        <path d="M14 22 L17 28" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M19 21 L21 28" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M24 22 L24 27" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" />
+      </g>
+
+
+      {/* ── CABEZA GRANDE RUBBER-HOSE FLEISCHER ── */}
+      {/* Cuello */}
+      <rect x="118" y="186" width="24" height="22" rx="4" fill="#f5f5ef" stroke="#000000" strokeWidth="4" />
+      {/* Hatching en cuello (Rule 1: sombra bajo barbilla) */}
+      <rect x="119" y="188" width="22" height="12" fill="url(#hatch-dark)" />
+
+      {/* Silueta exterior pesada de la cabeza (Rule 2) */}
+      <ellipse cx="130" cy="142" rx="68" ry="62" fill="#000000" />
+      {/* Rostro blanco hueso */}
+      <ellipse cx="130" cy="140" rx="63" ry="57" fill="#f5f5ef" stroke="#000000" strokeWidth="4" />
+
+      {/* Hatching lateral de volumen en la mejilla izquierda (Rule 1: volumen 3D) */}
+      <path d="M68 140 Q68 185 110 194 Q80 180 72 140 Z"
+        fill="url(#hatch-light)" opacity="0.8" />
+
+
+      {/* ── Rule 3: OJOS PIE-EYE CLÁSICOS FLEISCHER 1930s ── */}
+      {/* Ojo Izquierdo */}
+      <g transform="translate(100, 130)">
+        {/* Esclerótica ovalada grande */}
+        <ellipse cx="0" cy="0" rx="16" ry="20" fill="#ffffff" stroke="#000000" strokeWidth="3.5" />
+        {/* Pupila negra grande Pie-Eye */}
+        <ellipse cx="2" cy="2" rx="11" ry="15" fill="#000000" />
+        {/* RECORTE TRIANGULAR "PIE-CUTOUT" (Famoso ojo de pastel de los años 30) */}
+        <polygon points="2,2 -6,-8 6,-10" fill="#ffffff" />
+        {/* Punto de brillo circular secundario */}
+        <circle cx="5" cy="6" r="2.2" fill="#ffffff" />
+      </g>
+
+      {/* Ojo Derecho */}
+      <g transform="translate(150, 130)">
+        {/* Esclerótica ovalada grande */}
+        <ellipse cx="0" cy="0" rx="16" ry="20" fill="#ffffff" stroke="#000000" strokeWidth="3.5" />
+        {/* Pupila negra grande Pie-Eye */}
+        <ellipse cx="-2" cy="2" rx="11" ry="15" fill="#000000" />
+        {/* RECORTE TRIANGULAR "PIE-CUTOUT" */}
+        <polygon points="-2,2 -10,-8 2,-10" fill="#ffffff" />
+        {/* Punto de brillo circular secundario */}
+        <circle cx="1" cy="6" r="2.2" fill="#ffffff" />
+      </g>
+
+      {/* Rule 3: Cejas Gruesas Expresivas y Entusiastas */}
+      <path d="M82 104 Q100 95 118 104" stroke="#000000" strokeWidth="5.5" strokeLinecap="round" fill="none" />
+      <path d="M142 104 Q160 95 178 104" stroke="#000000" strokeWidth="5.5" strokeLinecap="round" fill="none" />
+
+
+      {/* ── BIGOTE VINTAGE CARACTERÍSTICO ── */}
+      <path d="M102 154 Q116 146 130 150 Q144 146 158 154 Q166 160 162 165 Q152 162 130 164 Q108 162 98 165 Q94 160 102 154 Z"
+        fill="#000000" stroke="#000000" strokeWidth="2" />
+      {/* Rizo de punta izquierda */}
+      <path d="M99 164 Q90 166 88 172 Q91 176 96 171 Z" fill="#000000" />
+      {/* Rizo de punta derecha */}
+      <path d="M161 164 Q170 166 172 172 Q169 176 164 171 Z" fill="#000000" />
+
+
+      {/* ── Rule 3: BOCA EXAGERADA / SONRISA CARTOON ANOS 30 ── */}
+      {/* Boca abierta gigante en D con lengua y dientes */}
+      <g transform="translate(130, 168)">
+        {/* Contorno boca */}
+        <path d="M-28 0 Q0 30 28 0 Q0 38 -28 0 Z"
+          fill="#000000" stroke="#000000" strokeWidth="4" strokeLinejoin="round" />
+        {/* Dientes superiores */}
+        <path d="M-22 2 Q0 12 22 2 L20 8 Q0 16 -20 8 Z" fill="#ffffff" />
+        <line x1="0" y1="4" x2="0" y2="12" stroke="#000000" strokeWidth="1.5" />
+        <line x1="-10" y1="3" x2="-9" y2="10" stroke="#000000" strokeWidth="1.5" />
+        <line x1="10" y1="3" x2="9" y2="10" stroke="#000000" strokeWidth="1.5" />
+        {/* Lengua roja vintage abajo */}
+        <path d="M-14 20 Q0 12 14 20 Q0 34 -14 20 Z" fill="#c1272d" stroke="#000000" strokeWidth="1.5" />
+        {/* Hoyuelos/Pliegues de risa en comisuras */}
+        <path d="M-32 -3 Q-28 4 -30 10" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M32 -3 Q28 4 30 10" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+      </g>
+
+
+      {/* ── SOMBRERO DE COPA BARBERO 1930s (Con Hatching debajo) ── */}
+      {/* Rule 1: Hatching denso de sombra bajo la visera sobre la frente */}
+      <path d="M68 95 Q130 115 192 95 Q180 118 130 122 Q80 118 68 95 Z"
+        fill="url(#cross-hatch)" />
+
+      {/* Visera / Ala del sombrero */}
+      <ellipse cx="130" cy="94" rx="82" ry="14" fill="#141414" stroke="#000000" strokeWidth="4.5" />
+      {/* Hatching en el ala izquierda */}
+      <ellipse cx="130" cy="94" rx="80" ry="12" fill="url(#hatch-dark)" opacity="0.6" />
+
+      {/* Copa del sombrero */}
+      <path d="M84 42 C82 32 95 30 130 30 C165 30 178 32 176 42 L172 90 Q130 98 88 90 Z"
+        fill="#141414" stroke="#000000" strokeWidth="4.5" strokeLinejoin="round" />
+
+      {/* Hatching de volumen en el lado izquierdo del sombrero */}
+      <path d="M84 42 C82 32 95 30 115 30 L112 92 Q98 94 88 90 Z"
+        fill="url(#hatch-dark)" opacity="0.9" />
+
+      {/* Banda roja del sombrero */}
+      <path d="M87 78 Q130 86 173 78 L172 90 Q130 98 88 90 Z"
+        fill="#c1272d" stroke="#000000" strokeWidth="2.5" />
+
+      {/* Botón de adorno en la copa */}
+      <circle cx="130" cy="30" r="5" fill="#f5f5ef" stroke="#000000" strokeWidth="2" />
     </g>
-
-    {/* Brazo derecho — levantado */}
-    <path d="M140 220 Q170 225 185 210 Q195 200 188 193 Q181 186 172 195 Q165 205 148 212"
-      stroke="#0d0d0d" strokeWidth="24" strokeLinecap="round" fill="none" />
-    <path d="M140 220 Q170 225 185 210 Q195 200 188 193 Q181 186 172 195 Q165 205 148 212"
-      stroke="#f5f5ef" strokeWidth="17" strokeLinecap="round" fill="none" />
-    {/* Guante derecho saludando */}
-    <ellipse cx="188" cy="191" rx="14" ry="13" fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="2.5" />
-    <path d="M178 184 Q175 176 179 172 Q184 170 187 175"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M183 182 Q181 174 185 170 Q189 169 191 174"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M188 181 Q187 173 191 170 Q195 170 196 175"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-    <path d="M193 183 Q193 175 196 173 Q200 173 200 179"
-      stroke="#0d0d0d" strokeWidth="2" fill="#f5f5ef" strokeLinecap="round" />
-
-    {/* ── CABEZA: proporciones exageradas Fleischer ── */}
-    {/* Cuello */}
-    <rect x="100" y="185" width="20" height="20" rx="4" fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="2.5" />
-
-    {/* Cabeza grande */}
-    <ellipse cx="110" cy="145" rx="62" ry="58" fill="#f5f5ef" stroke="#0d0d0d" strokeWidth="3" />
-    {/* Sombra lateral de cabeza (volumen con gris intermedio) */}
-    <path d="M155 120 Q172 145 168 175 Q160 180 148 175 Q160 150 158 120Z"
-      fill="#a8a8a0" opacity="0.45" />
-    {/* Sombra inferior de cuello */}
-    <path d="M80 180 Q90 195 110 195 Q130 195 140 180 Q130 190 110 192 Q90 190 80 180Z"
-      fill="#6b6b6b" opacity="0.3" />
-
-    {/* ── BIGOTE CARACTERÍSTICO 1930s ── */}
-    <path d="M92 162 Q100 155 110 158 Q120 155 128 162"
-      stroke="#0d0d0d" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-    {/* Bigote rizado por cada extremo */}
-    <path d="M93 162 Q87 165 86 170 Q87 173 91 170 Q93 165 93 162"
-      fill="#0d0d0d" />
-    <path d="M127 162 Q133 165 134 170 Q133 173 129 170 Q127 165 127 162"
-      fill="#0d0d0d" />
-
-    {/* ── OJOS "PIE-EYE" — característica Fleischer ── */}
-    {/* Esclerótica grande */}
-    <ellipse cx="90" cy="138" rx="18" ry="17" fill="white" stroke="#0d0d0d" strokeWidth="3" />
-    <ellipse cx="130" cy="138" rx="18" ry="17" fill="white" stroke="#0d0d0d" strokeWidth="3" />
-    {/* Iris oscuro */}
-    <circle cx="92" cy="140" r="10" fill="#1a1a1a" />
-    <circle cx="132" cy="140" r="10" fill="#1a1a1a" />
-    {/* Pupila brillante */}
-    <circle cx="95" cy="136" r="4" fill="#f5f5ef" />
-    <circle cx="135" cy="136" r="4" fill="#f5f5ef" />
-    {/* Destello pequeño */}
-    <circle cx="98" cy="133" r="2" fill="white" />
-    <circle cx="138" cy="133" r="2" fill="white" />
-    {/* Cejas expresivas */}
-    <path d="M75 122 Q90 116 105 120" stroke="#0d0d0d" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-    <path d="M115 120 Q130 116 145 122" stroke="#0d0d0d" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-
-    {/* ── SONRISA GRANDE ── */}
-    <path d="M88 170 Q110 185 132 170"
-      stroke="#0d0d0d" strokeWidth="3" strokeLinecap="round" fill="none" />
-    <path d="M88 170 Q110 190 132 170 L130 172 Q110 188 90 172Z"
-      fill="#0d0d0d" opacity="0.85" />
-    {/* Dientes */}
-    <path d="M98 172 Q110 182 122 172" fill="white" />
-    <line x1="110" y1="172" x2="110" y2="181" stroke="#0d0d0d" strokeWidth="1.5" />
-    <line x1="104" y1="172" x2="103" y2="180" stroke="#0d0d0d" strokeWidth="1" />
-    <line x1="116" y1="172" x2="117" y2="180" stroke="#0d0d0d" strokeWidth="1" />
-
-    {/* ── SOMBRERO DE BARBERO ── */}
-    {/* Ala del sombrero */}
-    <ellipse cx="110" cy="88" rx="72" ry="9" fill="#1a1a1a" stroke="#0d0d0d" strokeWidth="2.5" />
-    {/* Copa */}
-    <rect x="72" y="40" width="76" height="50" rx="6" fill="#1a1a1a" stroke="#0d0d0d" strokeWidth="2.5" />
-    {/* Banda roja del sombrero */}
-    <rect x="72" y="76" width="76" height="12" rx="2" fill="#c1272d" stroke="#0d0d0d" strokeWidth="1.5" />
-    {/* Detalle de trama en copa */}
-    <path d="M80 45 L78 76 M87 43 L85 76 M94 42 L92 76 M101 41 L99 76 M108 41 L106 76 M115 41 L113 76 M122 42 L120 76 M129 43 L127 76 M136 45 L134 76"
-      stroke="#3d3d3d" strokeWidth="0.7" opacity="0.5" />
-    {/* Ornamento de botón en la copa */}
-    <circle cx="110" cy="43" r="5" fill="#525252" stroke="#0d0d0d" strokeWidth="1.5" />
   </svg>
 )
 
@@ -262,7 +402,6 @@ export default function HomePage() {
       <section
         className="relative min-h-[88vh] flex items-center overflow-hidden"
         style={{
-          /* Fondo con degradado de "foco de luz única" (Ref B: iluminación noir) */
           background: `
             radial-gradient(ellipse 55% 70% at 30% 50%,
               #2a2a2a 0%,
@@ -276,7 +415,7 @@ export default function HomePage() {
         {/* Viñeta fuerte cinematográfica */}
         <div className="vignette-hard" />
 
-        {/* Trama de fondo tipo papel/madera (Ref B) */}
+        {/* Trama de fondo tipo papel/madera */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -427,7 +566,7 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Social proof — en tono papel y gris */}
+              {/* Social proof */}
               <div
                 className="inline-flex items-center gap-5"
                 style={{
@@ -463,14 +602,14 @@ export default function HomePage() {
 
             {/* ── Mascota Fleischer + Polo de Barbería ── */}
             <div className="hidden lg:flex flex-col items-center justify-center relative">
-              {/* Halo de luz cinematográfica detrás del personaje (Ref B) */}
+              {/* Halo de luz cinematográfica detrás del personaje */}
               <div
                 className="absolute"
                 style={{
-                  width: '340px',
-                  height: '340px',
+                  width: '360px',
+                  height: '360px',
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(80,80,80,0.15) 0%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(90,90,90,0.18) 0%, transparent 70%)',
                   top: '50%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
@@ -479,20 +618,20 @@ export default function HomePage() {
               />
 
               {/* Polos de barbería decorativos */}
-              <div className="absolute left-4 top-8" style={{ color: 'var(--gray-700)', opacity: 0.6 }}>
+              <div className="absolute left-2 top-6" style={{ color: 'var(--gray-700)', opacity: 0.6 }}>
                 <BarberPoleSVG />
               </div>
-              <div className="absolute right-4 top-8" style={{ color: 'var(--gray-700)', opacity: 0.6 }}>
+              <div className="absolute right-2 top-6" style={{ color: 'var(--gray-700)', opacity: 0.6 }}>
                 <BarberPoleSVG />
               </div>
 
-              {/* Mascota SVG */}
+              {/* Mascota SVG Rubber-Hose 1930s */}
               <div
                 className="animate-fadeInUp"
                 style={{
-                  width: '280px',
-                  height: '400px',
-                  filter: 'drop-shadow(6px 8px 0px rgba(0,0,0,0.7))',
+                  width: '320px',
+                  height: '430px',
+                  filter: 'drop-shadow(6px 8px 0px rgba(0,0,0,0.85))',
                 }}
               >
                 <BarberMascotSVG />
@@ -502,10 +641,10 @@ export default function HomePage() {
               <div
                 style={{
                   fontFamily: 'var(--font-label)',
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   letterSpacing: '0.25em',
                   textTransform: 'uppercase',
-                  color: 'var(--gray-600)',
+                  color: 'var(--gray-500)',
                   textAlign: 'center',
                   marginTop: '0.5rem',
                   borderTop: '1px solid var(--gray-700)',
@@ -556,7 +695,6 @@ export default function HomePage() {
                   borderRight: i < 2 ? '2px solid var(--gray-700)' : 'none',
                 }}
               >
-                {/* Icono en marco de tinta */}
                 <div
                   style={{
                     width: '44px',
@@ -694,7 +832,6 @@ export default function HomePage() {
                   zIndex: 3 - i,
                 }}
               >
-                {/* Número de panel tipo cómic */}
                 <div className="flex items-start gap-4 mb-4">
                   <span
                     style={{
