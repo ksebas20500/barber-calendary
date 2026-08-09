@@ -123,31 +123,34 @@ export default function ReservaPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-5">
                 {serviciosData?.map((s: any, idx: number) => (
                   <div
                     key={s.id}
                     onClick={() => { setServicio(s); setPaso(2) }}
                     className="card-servicio-vintage cursor-pointer"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    {/* Fila superior: nombre + precio */}
+                    <div className="flex items-start justify-between gap-4 min-w-0">
                       <h3
-                        className="text-2xl font-bold text-black"
+                        className="text-xl font-bold text-black leading-tight min-w-0 flex-1"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {s.nombre}
                       </h3>
                       <span
-                        className="text-2xl font-bold text-black"
+                        className="text-xl font-bold text-black whitespace-nowrap flex-shrink-0"
                         style={{ fontFamily: 'var(--font-display)' }}
                       >
                         {formatCOP(s.precio)}
                       </span>
                     </div>
                     <div className="border-b-2 border-dotted border-black/40 my-3" />
-                    <p className="font-mono text-xs text-black/80 mb-3">{s.descripcion}</p>
-                    <div className="font-mono text-[0.7rem] font-bold text-black/70 uppercase">
-                      DURACIÓN · {s.duracionMinutos} MIN
+                    <div className="flex items-end justify-between gap-4">
+                      <p className="font-mono text-xs text-black/80 flex-1 leading-relaxed">{s.descripcion}</p>
+                      <span className="font-mono text-[0.65rem] font-bold text-black/70 uppercase whitespace-nowrap flex-shrink-0">
+                        {s.duracionMinutos} MIN
+                      </span>
                     </div>
                   </div>
                 ))}

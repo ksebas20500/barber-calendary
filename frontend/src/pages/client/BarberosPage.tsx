@@ -25,9 +25,9 @@ function BarberoCard({ barbero }: { barbero: any }) {
   const nombreCorto = nombre.split(' ')[0].toUpperCase()
 
   return (
-    <div className="card-barbero-vintage flex flex-col justify-between h-full">
+    <div className="card-barbero-vintage bg-[#eae5d8] shadow-[5px_5px_0_#000] flex flex-col justify-between h-full">
       <div className="flex flex-col items-center">
-        {/* Círculo Inicial Negro (Estilo Foto 3) */}
+        {/* Círculo Inicial Negro */}
         <div className="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center mb-5 border-2 border-black shadow-[2px_2px_0_#000]">
           <span
             className="text-3xl font-bold font-mono"
@@ -75,20 +75,20 @@ export default function BarberosPage() {
   })
 
   return (
-    <div className="bg-[#0d0d0d] text-white min-h-screen py-16">
+    <div className="bg-[#eae5d8] text-[#1a1a1a] min-h-screen py-16">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-14">
-          <span className="font-mono text-xs tracking-[0.3em] uppercase text-white/60 block mb-2">
+          <span className="font-mono text-xs tracking-[0.3em] uppercase text-black/60 block mb-2">
             LA CUADRILLA
           </span>
           <h1
-            className="text-4xl md:text-6xl font-bold text-white mb-4"
+            className="text-4xl md:text-6xl font-bold text-black mb-4"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Nuestros barberos
           </h1>
-          <p className="font-mono text-xs text-white/70 max-w-md mx-auto">
+          <p className="font-mono text-xs text-black/70 max-w-md mx-auto">
             Cada uno con su especialidad y su estilo. Elige con quién quieres sentarte en el sillón.
           </p>
         </div>
@@ -99,27 +99,27 @@ export default function BarberosPage() {
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-[#171717] border-2 border-white/20 h-80 animate-pulse"
+                className="bg-[#e2ded2] border-2 border-black h-80 animate-pulse"
               />
             ))}
           </div>
         ) : isError ? (
-          <div className="text-center py-16 border-2 border-white bg-[#171717] p-8 max-w-lg mx-auto shadow-[4px_4px_0_#fff]">
-            <div className="text-3xl mb-3 text-white font-bold font-mono">⚠️ ERROR DE CONEXIÓN</div>
-            <p className="text-white/80 text-xs mb-6 font-mono">
+          <div className="text-center py-16 border-2 border-black bg-[#eae5d8] p-8 max-w-lg mx-auto shadow-[4px_4px_0_#000]">
+            <div className="text-3xl mb-3 text-black font-bold font-mono">⚠️ ERROR DE CONEXIÓN</div>
+            <p className="text-black/80 text-xs mb-6 font-mono">
               No se pudo obtener la lista de barberos del servidor backend.
             </p>
             <button
               onClick={() => refetch()}
-              className="btn-vintage-black bg-white text-black hover:bg-neutral-200"
+              className="btn-vintage-black"
             >
               Reintentar
             </button>
           </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4 text-white">✂</div>
-            <p className="font-mono text-sm text-white/60">No hay barberos registrados aún.</p>
+            <div className="text-6xl mb-4 text-black">✂</div>
+            <p className="font-mono text-sm text-black/60">No hay barberos registrados aún.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
