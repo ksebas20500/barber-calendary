@@ -57,8 +57,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const loginWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider)
-    // onAuthStateChanged handles the rest
+    const apiKey = import.meta.env.VITE_FIREBASE_API_KEY
+    if (!apiKey || apiKey === 'your_api_key') {
+      const msg =
+        '⚠️ No se ha configurado VITE_FIREBASE_API_KEY en el archivo frontend/.env.\n\nPor favor obtén tu Web API Key desde Firebase Console:\nProject Settings -> General -> Web Apps -> apiKey y colócala en frontend/.env'
+      console.error(msg)
+      alert(msg)
+      return
+    }
+
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch (error: any) {
+      console.error('Error al iniciar sesión con Google:', error)
+      if (error.code === 'auth/popup-blocked') {
+        alert('⚠️ El navegador bloqueó la ventana emergente de Google. Permite ventanas emergentes (popups) en tu navegador para continuar.')
+      } else if (error.code === 'auth/invalid-api-key' || error.code === 'auth/api-key-not-valid') {
+        alert('⚠️ La API Key de Firebase configurada en frontend/.env no es válida. Revisa la clave en la consola de Firebase.')
+      } else if (error.code === 'auth/unauthorized-domain') {
+        alert('⚠️ Dominio no autorizado en Firebase Console. Agrega "localhost" en Firebase Console -> Authentication -> Settings -> Authorized domains.')
+      } else if (error.code !== 'auth/popup-closed-by-user') {
+        alert(`⚠️ Error al iniciar sesión (${error.code || 'desconocido'}): ${error.message}`)
+      }
+    }
   }
 
   const logout = async () => {

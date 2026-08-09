@@ -2,13 +2,13 @@
 // Project: barberia-denver
 
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'barberia-denver.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'barberia-denver',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'barberia-denver.appspot.com',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
@@ -21,5 +21,5 @@ googleProvider.setCustomParameters({
   prompt: 'select_account',
 })
 
-export { signInWithPopup, signOut }
+export { signInWithPopup, signInWithRedirect, signOut }
 export default app
