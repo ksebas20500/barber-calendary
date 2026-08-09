@@ -108,7 +108,7 @@ function BarberoCard({ barbero }: { barbero: any }) {
 }
 
 export default function BarberosPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['barberos'],
     queryFn: () => barberosApi.getAll(),
     select: (res) => res.data.barberos,
@@ -142,6 +142,19 @@ export default function BarberosPage() {
                 className="border-2 border-[#3d3d3d] bg-[#141414] h-80 animate-pulse"
               />
             ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-16 border-2 border-[var(--color-red)] bg-[#141414] p-8 max-w-lg mx-auto shadow-[4px_4px_0_#000]">
+            <div className="text-4xl mb-3 text-[var(--color-red)] font-black">⚠️ ERROR DE CONEXIÓN</div>
+            <p className="text-white text-sm mb-6 font-mono">
+              No se pudo obtener la lista de barberos del servidor backend.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-6 py-2.5 bg-white text-black font-bold uppercase text-xs tracking-wider border-2 border-white hover:bg-[var(--color-red)] hover:text-white transition-colors"
+            >
+              Reintentar
+            </button>
           </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-20">

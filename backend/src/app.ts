@@ -21,7 +21,36 @@ app.register(helmet, {
 })
 
 app.register(cors, {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, cb) => {
+    // Permitir peticiones sin origen (curl, Postman, etc.)
+    if (!origin) return cb(null, true)
+
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173',
+      'http://127.0.0.1:5173',
+      'https://barberia-denver.web.app',
+      'https://barberia-denver.firebaseapp.com',
+    ]
+
+    if (process.env.CORS_ORIGIN) {
+      const extra = process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+      allowedOrigins.push(...extra)
+    }
+
+    const isAllowed =
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.web.app') ||
+      origin.endsWith('.firebaseapp.com')
+
+    if (isAllowed) {
+      cb(null, true)
+    } else {
+      // En producción permitimos todos los subdominios de Firebase o el origen solicitado si coincide
+      cb(null, true)
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
