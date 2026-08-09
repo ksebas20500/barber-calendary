@@ -37,19 +37,27 @@ export async function authRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: body.error.flatten() })
     }
 
+    const adminEmails = (process.env.ADMIN_EMAILS || 'kevinsebas5020@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+
+    const isTargetAdmin = adminEmails.includes(body.data.email.toLowerCase())
+    const initialRole = isTargetAdmin ? 'ADMIN' : 'CLIENTE'
+
     const usuario = await prisma.usuario.upsert({
       where: { firebaseUid: decoded.uid },
       update: {
         nombre: body.data.nombre,
         email: body.data.email,
         telefono: body.data.telefono,
+        ...(isTargetAdmin ? { rol: 'ADMIN' } : {}),
       },
       create: {
         firebaseUid: decoded.uid,
         nombre: body.data.nombre,
         email: body.data.email,
         telefono: body.data.telefono,
-        rol: 'CLIENTE',
+        rol: initialRole,
       },
     })
 
