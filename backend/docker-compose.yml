@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://neondb_owner:npg_d8xgoZpELe1H@ep-shy-cherry-ayj76f4o-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+    volumes:
+      - ./src:/app/src
+
+  postgres_dev:
+    image: postgres:15-alpine
+    container_name: barberia_postgres_local
+    environment:
+      POSTGRES_USER: barber_user
+      POSTGRES_PASSWORD: barber_password
+      POSTGRES_DB: barberia_local
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

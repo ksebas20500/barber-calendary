@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique
+  nombre      String
+  email       String   @unique
+  telefono    String?
+  rol         Rol      @default(CLIENTE)
+  creadoEn    DateTime @default(now())
+
+  barbero      Barbero?
+  citasCliente Cita[]   @relation("CitasCliente")
+  resenas      Resena[]
+}
+
+enum Rol {
+  CLIENTE
+  BARBERO
+  ADMIN
+}
+
+model Barbero {
+  id           String   @id @default(cuid())
+  usuarioId    String   @unique
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  especialidad String   @default("Barbero")
+  fotoUrl      String?
+  activo       Boolean  @default(true)
+  creadoEn     DateTime @default(now())
+
+  citas    Cita[]
+  horarios HorarioBarbero[]
+  resenas  Resena[]
+}
+
+model Servicio {
+  id              String    @id @default(cuid())
+  nombre          String
+  descripcion     String
+  precio          Int // en COP (pesos enteros)
+  duracionMinutos Int
+  categoria       Categoria
+  activo          Boolean   @default(true)
+  imagenUrl       String?
+  popular         Boolean   @default(false)
+  creadoEn        DateTime  @default(now())
+
+  citas Cita[]
+}
+
+enum Categoria {
+  CORTE
+  PREMIUM
+  CEJAS
+  BARBA
+  COMBO
+}
+
+model Cita {
+  id         String     @id @default(cuid())
+  clienteId  String
+  cliente    Usuario    @relation("CitasCliente", fields: [clienteId], references: [id])
+  barberoId  String
+  barbero    Barbero    @relation(fields: [barberoId], references: [id])
+  servicioId String
+  servicio   Servicio   @relation(fields: [servicioId], references: [id])
+  fecha      DateTime   @db.Date
+  horaInicio DateTime
+  horaFin    DateTime
+  estado     EstadoCita @default(CONFIRMADA)
+  notas      String?
+  creadoEn   DateTime   @default(now())
+
+  resena Resena?
+}
+
+enum EstadoCita {
+  CONFIRMADA
+  COMPLETADA
+  CANCELADA
+  NO_SHOW
+}
+
+model Resena {
+  id         String   @id @default(cuid())
+  clienteId  String
+  cliente    Usuario  @relation(fields: [clienteId], references: [id])
+  barberoId  String
+  barbero    Barbero  @relation(fields: [barberoId], references: [id])
+  citaId     String   @unique
+  cita       Cita     @relation(fields: [citaId], references: [id])
+  estrellas  Int // 1-5
+  comentario String?
+  oculta     Boolean  @default(false)
+  fecha      DateTime @default(now())
+}
+
+model HorarioBarbero {
+  id         String  @id @default(cuid())
+  barberoId  String
+  barbero    Barbero @relation(fields: [barberoId], references: [id], onDelete: Cascade)
+  diaSemana  Int // 0=Dom, 1=Lun ... 6=Sáb
+  horaInicio String // "09:00"
+  horaFin    String // "17:00"
+  disponible Boolean @default(true)
+
+  @@unique([barberoId, diaSemana])
+}

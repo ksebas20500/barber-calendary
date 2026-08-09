@@ -1,0 +1,441 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════
+   BARBERÍA DENVER — Fleischer 1930s Rubber Hose B&W Design System
+   Estilo: Caricatura Clásica Blanco y Negro (Popeye 1930s / Steamboat Willie / Cuphead)
+   ═══════════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* ── Palette ────────────────────────────────────────── */
+    --bg-base:       #0a0a0a;        /* negro casi puro */
+    --bg-surface:    #141414;        /* superficies/tarjetas */
+    --ink:           #f5f5f0;        /* blanco hueso */
+    --ink-muted:     #b8b8b0;        /* texto secundario gris claro */
+    --line:          #ffffff;        /* contornos tipo tinta */
+    --accent:        #d61f26;        /* rojo puro "cartel de circo" SOLO CTAs */
+    --accent-hover:  #b8191f;        /* hover para accent */
+    --grain-opacity: 0.06;           /* textura grano de película */
+
+    /* Legacy system compatibility */
+    --color-bg:      var(--bg-base);
+    --color-bg-card: var(--bg-surface);
+    --color-cream:   var(--ink);
+    --color-sepia:   #ffffff;
+    --color-sepia-dk: #999990;
+    --color-red:     var(--accent);
+    --color-red-dk:  var(--accent-hover);
+    --color-white:   #ffffff;
+    --color-gray:    var(--ink-muted);
+    --color-border:  #282828;
+    --color-ink:     #0a0a0a;
+
+    /* ── Typography ────────────────────────────────────── */
+    --font-display:  'Bungee', 'Bebas Neue', display, sans-serif;
+    --font-title:    'Bungee', 'Bebas Neue', sans-serif;
+    --font-body:     'Inter', 'Work Sans', sans-serif;
+
+    /* ── Sizing & Radius ───────────────────────────────── */
+    --radius-sm:     4px;
+    --radius-md:     8px;
+    --radius-lg:     12px;
+    --radius-xl:     20px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* 1930s Film grain overlay texture */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 90px 90px;
+    mix-blend-mode: overlay;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+
+  h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+  h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
+  h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
+
+  a {
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  /* Custom scrollbar in B&W */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb {
+    background: #333333;
+    border: 1px solid #111111;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT CLASSES (CARTOON VINTAGE RUBBER HOSE)
+   ═══════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* ── Vignette section overlay ─────────────────────── */
+  .vignette-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+  }
+
+  /* ── Cartoon Buttons ────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 3px solid #000000;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    user-select: none;
+  }
+
+  .btn:active {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 1px 1px 0 #000000 !important;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: #000000;
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000000;
+  }
+
+  .btn-secondary {
+    background: var(--bg-surface);
+    color: var(--ink);
+    border-color: var(--line);
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  .btn-secondary:hover {
+    background: var(--ink);
+    color: #000000;
+    border-color: #ffffff;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000000;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .btn-ghost:hover {
+    color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ── Vintage Cartoon Cards ────────────────────────── */
+  .card {
+    background: var(--bg-surface);
+    border: 3px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: 5px 5px 0 #000000;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: var(--line);
+    box-shadow: 8px 8px 0 #000000, 0 0 0 1px var(--line);
+    transform: translate(-3px, -3px);
+  }
+
+  /* ── Ink border utilities ─────────────────────────── */
+  .ink-border {
+    border: 3px solid var(--line);
+    box-shadow: 5px 5px 0 #000000;
+  }
+
+  .ink-border-red {
+    border: 3px solid var(--accent);
+    box-shadow: 5px 5px 0 #000000;
+  }
+
+  /* ── Badges ────────────────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 2px solid #000000;
+  }
+
+  .badge-popular {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 2px 2px 0 #000000;
+  }
+
+  .badge-active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 2px 2px 0 #000000;
+  }
+
+  .badge-inactive {
+    background: #333333;
+    color: var(--ink-muted);
+    border-color: #555555;
+  }
+
+  /* ── Vintage Section Divider ──────────────────────── */
+  .divider-ornament {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--ink-muted);
+    font-size: 1.2rem;
+  }
+
+  .divider-ornament::before,
+  .divider-ornament::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: #2a2a2a;
+  }
+
+  /* ── Page Layout ──────────────────────────────────── */
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ── Form Inputs ──────────────────────────────────── */
+  .input {
+    width: 100%;
+    background: #141414;
+    border: 2px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--ink);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .input:focus {
+    border-color: var(--line);
+    box-shadow: 5px 5px 0 #000000;
+    background: #1a1a1a;
+  }
+
+  .input::placeholder {
+    color: var(--ink-muted);
+  }
+
+  /* ── Star rating (B&W Ink style) ──────────────────── */
+  .stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--ink);
+  }
+
+  /* ── Slot buttons ─────────────────────────────────── */
+  .slot-btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--line);
+    background: var(--bg-surface);
+    color: var(--ink);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-family: var(--font-body);
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .slot-btn:hover {
+    background: var(--ink);
+    color: #000000;
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000000;
+  }
+
+  .slot-btn.selected {
+    background: var(--accent);
+    border-color: #000000;
+    color: #ffffff;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .slot-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ── Wizard Step Indicator ────────────────────────── */
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .step-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+    border: 3px solid var(--line);
+    background: var(--bg-surface);
+    color: var(--ink-muted);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .step-dot.active {
+    border-color: #000000;
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  .step-dot.done {
+    border-color: var(--line);
+    background: var(--ink);
+    color: #000000;
+  }
+
+  .step-line {
+    flex: 1;
+    height: 3px;
+    background: #333333;
+    transition: background 0.3s ease;
+  }
+
+  .step-line.done {
+    background: var(--line);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS (RUBBER HOSE CARTOON)
+   ═══════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  /* Squash & stretch rubber hose cartoon animation */
+  @keyframes squash {
+    0%   { transform: scale(1, 1); }
+    30%  { transform: scale(1.1, 0.9); }
+    60%  { transform: scale(0.94, 1.06); }
+    100% { transform: scale(1, 1); }
+  }
+
+  .animate-squash {
+    animation: squash 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-spin {
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Text cartoon outline helper */
+  .text-cartoon-shadow {
+    text-shadow: 3px 3px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  }
+}
+

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: barberia-denver-backend
+    env: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npx prisma migrate deploy && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://barberia-denver.web.app
+      - key: FIREBASE_PROJECT_ID
+        value: barberia-denver
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
