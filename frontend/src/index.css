@@ -81,7 +81,6 @@
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
-    /* Sin anti-aliasing agresivo = aspecto más "impreso" */
     text-rendering: optimizeLegibility;
   }
 
@@ -96,10 +95,7 @@
     min-height: 100vh;
   }
 
-  /* ── CAPA 1: Grano de Celuloide/Película — OBLIGATORIA ──
-     Simula el grano real de película de 35mm de los años 30.
-     Opacidad 12% en overlay produce una textura claramente visible
-     sin afectar legibilidad (WCAG AA se mantiene). */
+  /* ── CAPA 1: Grano de Celuloide/Película — OBLIGATORIA ── */
   body::before {
     content: '';
     position: fixed;
@@ -107,22 +103,20 @@
     pointer-events: none;
     z-index: 9000;
     opacity: var(--grain-opacity);
-    /* SVG con turbulencia fractal — simula grano de celuloide */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.72' numOctaves='4' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23grain)' opacity='1'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 180px 180px;
     mix-blend-mode: overlay;
   }
 
-  /* ── CAPA 2: Manchas de celuloide envejecido ──
-     Puntos oscuros aleatorios tipo "scratches" de carrete antiguo */
+  /* ── CAPA 2: Manchas de celuloide envejecido ── */
   body::after {
     content: '';
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 8999;
-    opacity: 0.03;
+    opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='spots'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='2' seed='8'/%3E%3CfeThreshold stdDeviation='0' operator='over'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23spots)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 300px 300px;
@@ -134,7 +128,7 @@
     font-family: var(--font-display);
     line-height: 1.1;
     letter-spacing: 0.02em;
-    font-weight: 400; /* Ultra ya es peso máximo */
+    font-weight: 400;
   }
 
   h1 { font-size: clamp(2.4rem, 6vw, 5rem); }
@@ -178,7 +172,6 @@
         rgba(0,0,0,var(--vignette-power)) 100%);
   }
 
-  /* Variante para secciones oscuras (viñeta fuerte) */
   .vignette-hard {
     position: absolute;
     inset: 0;
@@ -190,7 +183,6 @@
         rgba(0,0,0,0.97) 100%);
   }
 
-  /* ── Fondo trama rayada (hatching) — da "volumen" tipo ilustración ── */
   .bg-hatching {
     background-image:
       repeating-linear-gradient(
@@ -202,7 +194,6 @@
       );
   }
 
-  /* ── Fondo papel viejo — para secciones de contraste claro ── */
   .bg-paper {
     background-color: var(--paper);
     background-image:
@@ -223,18 +214,14 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
-    /* Esquinas mínimas — "dibujado", no "diseño sistema digital" */
     border-radius: var(--radius-sm);
     border: 2.5px solid var(--black);
-    /* Sombra dura desplazada tipo cómic — NO difusa */
     box-shadow: 5px 5px 0 var(--black);
     transition:
       transform 0.12s ease,
       box-shadow 0.12s ease;
     position: relative;
     user-select: none;
-    /* Texture interna de tinta */
-    background-image: none;
   }
 
   .btn:active {
@@ -242,13 +229,11 @@
     box-shadow: 2px 2px 0 var(--black) !important;
   }
 
-  /* Botón primario — solo en CTAs cruciales */
   .btn-primary {
     background-color: var(--accent-red);
     color: var(--white);
     border-color: var(--black);
     box-shadow: 5px 5px 0 var(--black);
-    /* Texture de tinta roja sobre el botón */
     background-image:
       repeating-linear-gradient(
         -55deg,
@@ -265,7 +250,6 @@
     box-shadow: 7px 7px 0 var(--black);
   }
 
-  /* Botón secundario — aspecto de sello */
   .btn-secondary {
     background-color: var(--gray-800);
     color: var(--white);
@@ -292,14 +276,11 @@
     box-shadow: 3px 3px 0 var(--gray-700);
   }
 
-  /* ── TARJETAS: superficie de madera/cartón prensado ── */
   .card {
     background-color: var(--gray-800);
-    /* Doble borde: borde externo delgado + borde interno de sombra */
     border: 2.5px solid var(--gray-600);
     border-radius: var(--radius-md);
     padding: 1.5rem;
-    /* Sombra dura, NO difusa */
     box-shadow:
       4px 4px 0 var(--black),
       0 0 0 1px var(--gray-700);
@@ -307,7 +288,6 @@
       transform 0.15s ease,
       box-shadow 0.15s ease;
     position: relative;
-    /* Grano interno sutil */
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='cardgrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23cardgrain)' opacity='0.04'/%3E%3C/svg%3E");
     background-blend-mode: overlay;
@@ -321,7 +301,6 @@
     border-color: var(--gray-400);
   }
 
-  /* ── BADGE: sello de goma tipo imprenta ── */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -362,7 +341,6 @@
     border-color: var(--gray-600);
   }
 
-  /* ── SEPARADOR: línea de tinta con ornamento ── */
   .divider-ornament {
     display: flex;
     align-items: center;
@@ -381,18 +359,15 @@
     background: linear-gradient(to right, transparent, var(--gray-600), transparent);
   }
 
-  /* ── CONTENEDOR ── */
   .page-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
 
-  /* ── INPUTS: aspecto de formulario de época ── */
   .input {
     width: 100%;
     background-color: var(--gray-900);
-    /* Borde de tinta visible */
     border: 2px solid var(--gray-600);
     border-radius: var(--radius-sm);
     color: var(--white);
@@ -416,7 +391,6 @@
     font-style: italic;
   }
 
-  /* ── ESTRELLAS: asteriscos de tinta ── */
   .stars {
     display: inline-flex;
     gap: 3px;
@@ -424,7 +398,6 @@
     font-size: 1.1em;
   }
 
-  /* ── SLOT BOTONES: celdas de calendario tipo taquilla ── */
   .slot-btn {
     padding: 0.45rem 0.85rem;
     border-radius: var(--radius-sm);
@@ -470,7 +443,6 @@
     box-shadow: none;
   }
 
-  /* ── WIZARD STEPS ── */
   .step-indicator {
     display: flex;
     align-items: center;
@@ -520,7 +492,6 @@
     background-color: var(--gray-400);
   }
 
-  /* ── BORDES DE TINTA (utilidades de contorno) ── */
   .ink-border {
     border: 2.5px solid var(--white);
     box-shadow: 4px 4px 0 var(--black), -1px -1px 0 var(--gray-700);
@@ -531,9 +502,7 @@
     box-shadow: 4px 4px 0 var(--black);
   }
 
-  /* ── TÍTULO CON CONTORNO DE TINTA (efecto texto sello) ── */
   .text-ink-outline {
-    /* Contorno de tinta orgánico — 8 direcciones para efecto grueso */
     text-shadow:
       2px  2px  0 var(--black),
       -2px  2px  0 var(--black),
@@ -545,13 +514,11 @@
        0  -2px  0 var(--black);
   }
 
-  /* ── TEXTO IMPRESO (aspecto de máquina de escribir) ── */
   .text-typewriter {
     font-family: var(--font-mono);
     letter-spacing: 0.05em;
   }
 
-  /* ── SECCIÓN CON BORDE SUPERIOR DE TINTA (como paneles de cómic) ── */
   .panel-border-top {
     border-top: 3px solid var(--gray-600);
   }
@@ -561,7 +528,6 @@
     box-shadow: inset 0 0 0 1px var(--gray-700);
   }
 
-  /* ── "SCRATCHES" líneas de película horizontales ── */
   .film-scratch::before {
     content: '';
     position: absolute;
@@ -574,23 +540,19 @@
     pointer-events: none;
   }
 
-  /* ── NAVBAR: fondo tinta con textura de prensa ── */
   .navbar-bg {
     background-color: rgba(10, 10, 10, 0.97);
     backdrop-filter: blur(8px);
-    /* Línea de tinta inferior doble */
     border-bottom: 2px solid var(--gray-700);
     box-shadow: 0 2px 0 var(--gray-800);
   }
 
-  /* ── Indicador de sección activa en nav ── */
   .nav-active {
     color: var(--white);
     border-bottom: 2px solid var(--accent-red);
     padding-bottom: 2px;
   }
 
-  /* ── CARD IMAGEN: aspecto de fotograma de película ── */
   .film-frame {
     position: relative;
     border: 3px solid var(--gray-700);
@@ -602,7 +564,6 @@
   }
 
   .film-frame img {
-    /* Imágenes en B&W con alto contraste como en celuloide */
     filter: grayscale(100%) contrast(1.15) brightness(0.9);
     transition: filter 0.3s ease;
   }
@@ -613,12 +574,83 @@
 }
 
 /* ============================================================
-   ANIMACIONES — Rubber Hose 1930s (elástico, no digital)
+   ANIMACIONES — Rubber Hose 1930s (animación elástica vintage)
    ============================================================ */
 
 @layer utilities {
 
-  /* Squash & Stretch orgánico */
+  /* ── Bounce rítmico Rubber Hose 1930s (tipo Steamboat Willie / Cuphead) ── */
+  @keyframes rubberHoseBounce {
+    0%, 100% {
+      transform: translateY(0) scale(1, 1);
+    }
+    25% {
+      transform: translateY(8px) scale(1.05, 0.92);
+    }
+    50% {
+      transform: translateY(-10px) scale(0.95, 1.06);
+    }
+    75% {
+      transform: translateY(4px) scale(1.02, 0.98);
+    }
+  }
+
+  .animate-rubber-bounce {
+    animation: rubberHoseBounce 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    transform-origin: bottom center;
+  }
+
+  /* ── Tijeras chasqueando en ciclo ── */
+  @keyframes scissorsSnap {
+    0%, 100% { transform: rotate(-22deg); }
+    20% { transform: rotate(-36deg); }
+    30% { transform: rotate(-10deg); }
+    40% { transform: rotate(-34deg); }
+    50% { transform: rotate(-12deg); }
+  }
+
+  .animate-scissors {
+    animation: scissorsSnap 2.2s ease-in-out infinite;
+    transform-origin: 19px 25px;
+  }
+
+  /* ── Brazo saludando elastizado ── */
+  @keyframes rubberArmWave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(10deg) translateY(-4px); }
+    75% { transform: rotate(-8deg) translateY(3px); }
+  }
+
+  .animate-rubber-arm {
+    animation: rubberArmWave 1.6s ease-in-out infinite;
+    transform-origin: 170px 230px;
+  }
+
+  /* ── Parpadeo ojo pie-eye ── */
+  @keyframes pieEyeBlink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.08); }
+  }
+
+  .animate-blink {
+    animation: pieEyeBlink 3.8s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  /* ── Proyector de cine mudo (vibración leve de fotograma) ── */
+  @keyframes filmJitter {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(0.5px, -0.5px); }
+    40% { transform: translate(-0.5px, 0.5px); }
+    60% { transform: translate(-0.8px, -0.3px); }
+    80% { transform: translate(0.4px, 0.6px); }
+  }
+
+  .animate-film-jitter {
+    animation: filmJitter 0.25s steps(2, jump-none) infinite;
+  }
+
+  /* Squash & Stretch orgánico para botones */
   @keyframes squash {
     0%   { transform: scale(1, 1); }
     20%  { transform: scale(1.12, 0.88); }
@@ -631,7 +663,6 @@
     animation: squash 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
   }
 
-  /* Entrada suave desde abajo */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -641,7 +672,6 @@
     animation: fadeInUp 0.45s ease forwards;
   }
 
-  /* Fade simple */
   @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -651,7 +681,6 @@
     animation: fadeIn 0.3s ease forwards;
   }
 
-  /* Spin simple */
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -660,42 +689,6 @@
     animation: spin 0.8s linear infinite;
   }
 
-  /* Parpadeo celuloide — MUY SUTIL, accesible (< 3 destellos/s) */
-  @keyframes filmFlicker {
-    0%   { opacity: 1; }
-    92%  { opacity: 1; }
-    93%  { opacity: 0.92; }
-    94%  { opacity: 1; }
-    96%  { opacity: 0.95; }
-    100% { opacity: 1; }
-  }
-
-  .animate-flicker {
-    animation: filmFlicker 8s ease infinite;
-  }
-
-  /* Skeleton loading en estilo "trama" */
-  @keyframes hatchScan {
-    0%   { background-position: 0 0; }
-    100% { background-position: 40px 40px; }
-  }
-
-  .skeleton {
-    background-color: var(--gray-800);
-    background-image:
-      repeating-linear-gradient(
-        -45deg,
-        var(--gray-800) 0,
-        var(--gray-800) 4px,
-        var(--gray-700) 4px,
-        var(--gray-700) 8px
-      );
-    background-size: 40px 40px;
-    animation: hatchScan 0.6s linear infinite;
-    border-radius: var(--radius-sm);
-  }
-
-  /* Sombra texto (contorno de tinta 1930s para títulos grandes) */
   .text-cartoon-shadow {
     text-shadow:
       3px  3px 0 var(--black),
@@ -706,7 +699,6 @@
        3px  1px 0 var(--black);
   }
 
-  /* Utilidad helper para grises intermedios */
   .text-gray-900 { color: var(--gray-900); }
   .text-gray-700 { color: var(--gray-700); }
   .text-gray-500 { color: var(--gray-500); }
