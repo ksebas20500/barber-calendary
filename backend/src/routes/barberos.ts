@@ -2,7 +2,6 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { requireAdmin } from '../middlewares/firebaseAuth'
-import { addMinutes, format, parseISO, isAfter, isBefore, setHours, setMinutes } from 'date-fns'
 
 const barberoSchema = z.object({
   usuarioId: z.string(),
@@ -62,6 +61,7 @@ export async function barberosRoutes(app: FastifyInstance) {
   /**
    * GET /barberos/:id/disponibilidad — Público
    * Query params: fecha (YYYY-MM-DD), servicioId
+   * Takes into account exact service duration & existing Colombia time appointments
    */
   app.get('/barberos/:id/disponibilidad', async (request, reply) => {
     const { id } = request.params as { id: string }
@@ -71,8 +71,8 @@ export async function barberosRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: 'Se requieren fecha y servicioId' })
     }
 
-    const fechaDate = parseISO(fecha)
-    const diaSemana = fechaDate.getDay()
+    const fechaBogota = new Date(`${fecha}T00:00:00.000-05:00`)
+    const diaSemana = fechaBogota.getDay()
 
     // Get barber schedule for the day
     const horario = await prisma.horarioBarbero.findUnique({
@@ -93,48 +93,54 @@ export async function barberosRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: 'Servicio no encontrado' })
     }
 
-    // Get existing appointments for this barber on this date
+    // Get existing appointments for this barber on this date (Colombia time range)
+    const dayStart = new Date(`${fecha}T00:00:00.000-05:00`)
+    const dayEnd = new Date(`${fecha}T23:59:59.999-05:00`)
+
     const citasExistentes = await prisma.cita.findMany({
       where: {
         barberoId: id,
-        fecha: fechaDate,
         estado: { in: ['CONFIRMADA', 'COMPLETADA'] },
+        horaInicio: { gte: dayStart, lte: dayEnd },
       },
       select: { horaInicio: true, horaFin: true },
     })
 
-    // Generate available slots
+    // Generate available slots (considering requested service duration)
     const slots: string[] = []
-    const [inicioHora, inicioMin] = horario.horaInicio.split(':').map(Number)
-    const [finHora, finMin] = horario.horaFin.split(':').map(Number)
+    const startMs = new Date(`${fecha}T${horario.horaInicio}:00.000-05:00`).getTime()
+    const endMs = new Date(`${fecha}T${horario.horaFin}:00.000-05:00`).getTime()
 
-    let current = setMinutes(setHours(fechaDate, inicioHora), inicioMin)
-    const endOfDay = setMinutes(setHours(fechaDate, finHora), finMin)
+    const lunchStartMs = new Date(`${fecha}T12:00:00.000-05:00`).getTime()
+    const lunchEndMs = new Date(`${fecha}T12:30:00.000-05:00`).getTime()
 
-    // Lunch break: 12:00 - 12:30
-    const lunchStart = setMinutes(setHours(fechaDate, 12), 0)
-    const lunchEnd = setMinutes(setHours(fechaDate, 12), 30)
+    const serviceDurationMs = servicio.duracionMinutos * 60000
+    let curr = startMs
 
-    while (isAfter(endOfDay, addMinutes(current, servicio.duracionMinutos - 1))) {
-      const slotEnd = addMinutes(current, servicio.duracionMinutos)
-      const slotLabel = format(current, 'HH:mm')
+    while (curr + serviceDurationMs <= endMs) {
+      const slotEndMs = curr + serviceDurationMs
 
       // Check lunch break overlap
-      const overlapsLunch =
-        isBefore(current, lunchEnd) && isAfter(slotEnd, lunchStart)
+      const overlapsLunch = curr < lunchEndMs && slotEndMs > lunchStartMs
 
       // Check existing appointment overlap
       const overlapsAppointment = citasExistentes.some((cita) => {
-        const citaStart = new Date(cita.horaInicio)
-        const citaEnd = new Date(cita.horaFin)
-        return isBefore(current, citaEnd) && isAfter(slotEnd, citaStart)
+        const citaStartMs = new Date(cita.horaInicio).getTime()
+        const citaEndMs = new Date(cita.horaFin).getTime()
+        return curr < citaEndMs && slotEndMs > citaStartMs
       })
 
       if (!overlapsLunch && !overlapsAppointment) {
+        const slotLabel = new Date(curr).toLocaleTimeString('es-CO', {
+          timeZone: 'America/Bogota',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
         slots.push(slotLabel)
       }
 
-      current = addMinutes(current, 30) // 30-min slot intervals
+      curr += 30 * 60000 // 30-minute interval check
     }
 
     return reply.send({ slots, duracionMinutos: servicio.duracionMinutos })

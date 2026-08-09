@@ -17,11 +17,23 @@ export function formatCOP(amount: number): string {
 }
 
 export function formatDate(date: Date | string): string {
-  return format(new Date(date), "EEEE d 'de' MMMM", { locale: es })
+  const d = typeof date === 'string' ? new Date(date) : date
+  return d.toLocaleDateString('es-CO', {
+    timeZone: 'America/Bogota',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
 }
 
 export function formatTime(date: Date | string): string {
-  return format(new Date(date), 'h:mm a', { locale: es })
+  const d = typeof date === 'string' ? new Date(date) : date
+  return d.toLocaleTimeString('es-CO', {
+    timeZone: 'America/Bogota',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).toUpperCase()
 }
 
 export function renderStars(rating: number): string {

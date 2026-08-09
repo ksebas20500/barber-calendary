@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import { authenticate, requireAdmin, requireStaff } from '../middlewares/firebaseAuth'
-import { addMinutes, parseISO, isAfter, isBefore, setHours, setMinutes, differenceInHours } from 'date-fns'
+import { differenceInHours } from 'date-fns'
 
 const crearCitaSchema = z.object({
   barberoId: z.string(),
@@ -22,10 +22,15 @@ const adminCitaSchema = z.object({
   notas: z.string().optional(),
 })
 
+// Helper to construct Date objects in Colombia timezone (UTC-5)
+const createBogotaDate = (fechaStr: string, horaStr = '00:00'): Date => {
+  return new Date(`${fechaStr}T${horaStr}:00.000-05:00`)
+}
+
 export async function citasRoutes(app: FastifyInstance) {
   /**
    * POST /citas — Cliente autenticado: crear cita
-   * Uses a DB transaction with lock to prevent race conditions.
+   * Uses DB transaction with lock to prevent double-booking race conditions.
    */
   app.post('/citas', { preHandler: authenticate }, async (request, reply) => {
     const body = crearCitaSchema.safeParse(request.body)
@@ -44,12 +49,10 @@ export async function citasRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: 'Servicio no encontrado o inactivo' })
     }
 
-    const fechaDate = parseISO(fecha)
-    const [hh, mm] = horaInicio.split(':').map(Number)
-    const startDateTime = setMinutes(setHours(fechaDate, hh), mm)
-    const endDateTime = addMinutes(startDateTime, servicio.duracionMinutos)
+    const startDateTime = createBogotaDate(fecha, horaInicio)
+    const endDateTime = new Date(startDateTime.getTime() + servicio.duracionMinutos * 60000)
+    const fechaDate = createBogotaDate(fecha, '00:00')
 
-    // Transaction with conflict check (prevents double-booking race conditions)
     try {
       const cita = await prisma.$transaction(async (tx) => {
         // Check for conflicting appointments within the transaction
@@ -159,16 +162,22 @@ export async function citasRoutes(app: FastifyInstance) {
       estado?: string
     }
 
-    // Barbers can only see their own appointments
     const effectiveBarberoId =
       request.user!.rol === 'BARBERO'
         ? (await prisma.barbero.findFirst({ where: { usuarioId: request.user!.dbId } }))?.id
         : barberoId
 
+    let fechaFilter = {}
+    if (fecha) {
+      const dayStart = createBogotaDate(fecha, '00:00')
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000 - 1)
+      fechaFilter = { horaInicio: { gte: dayStart, lte: dayEnd } }
+    }
+
     const citas = await prisma.cita.findMany({
       where: {
         ...(effectiveBarberoId ? { barberoId: effectiveBarberoId } : {}),
-        ...(fecha ? { fecha: parseISO(fecha) } : {}),
+        ...fechaFilter,
         ...(estado ? { estado: estado as any } : {}),
       },
       include: {
@@ -183,7 +192,7 @@ export async function citasRoutes(app: FastifyInstance) {
   })
 
   /**
-   * POST /admin/citas — Admin: crear cita manualmente (phone/walk-in)
+   * POST /admin/citas — Admin: crear cita manualmente
    */
   app.post('/admin/citas', { preHandler: requireAdmin }, async (request, reply) => {
     const body = crearCitaSchema.extend({ clienteId: z.string() }).safeParse(request.body)
@@ -196,10 +205,9 @@ export async function citasRoutes(app: FastifyInstance) {
     const servicio = await prisma.servicio.findUnique({ where: { id: servicioId } })
     if (!servicio) return reply.status(404).send({ error: 'Servicio no encontrado' })
 
-    const fechaDate = parseISO(fecha)
-    const [hh, mm] = horaInicio.split(':').map(Number)
-    const startDateTime = setMinutes(setHours(fechaDate, hh), mm)
-    const endDateTime = addMinutes(startDateTime, servicio.duracionMinutos)
+    const startDateTime = createBogotaDate(fecha, horaInicio)
+    const endDateTime = new Date(startDateTime.getTime() + servicio.duracionMinutos * 60000)
+    const fechaDate = createBogotaDate(fecha, '00:00')
 
     try {
       const cita = await prisma.$transaction(async (tx) => {
